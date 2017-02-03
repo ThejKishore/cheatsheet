@@ -1,0 +1,21 @@
+Application-Specific System Variables
+	CF_INSTANCE_ADDR
+	CF_INSTANCE_GUID
+	CF_INSTANCE_INDEX
+	CF_INSTANCE_IP
+	CF_INSTANCE_INTERNAL_IP
+	CF_INSTANCE_PORT
+	CF_INSTANCE_PORTS
+	DATABASE_URL
+	HOME
+	MEMORY_LIMIT
+	PORT
+	PWD
+	TMPDIR
+	USER
+	VCAP_APP_HOST
+	VCAP_APP_PORT
+	VCAP_APPLICATION
+	VCAP_SERVICES
+
+https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#view-env

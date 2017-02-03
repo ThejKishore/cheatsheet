@@ -1,0 +1,32 @@
+---
+applications:
+- name: nifty-gui
+  memory: 512M
+  host: nifty
+  path: /path/to/application/bits
+  buildpack: buildpack_URL
+  disk_quota: 1024M
+  timeout: 80
+  env:
+    RAILS_ENV: production
+    RACK_ENV: production
+  services:
+   - instance_ABC
+   - instance_XYZ
+  domain: unique-example.com
+  domains:
+  - domain-example1.com
+  - domain-example2.org
+  stack: cflinuxfs2
+  instances: 2
+  health-check-type: port
+   hosts:
+  - app_host1
+  - app_host2
+  no-hostname: true
+  routes:
+  - route: example.com
+  - route: www.example.com/foo
+  - route: tcp-example.com:1234
+  random-route: true
+

@@ -1,0 +1,104 @@
+http://cli.cloudfoundry.org/en-US/cf/
+-----------------------------------------------
+
+$ cf push APP-NAME
+Run the following command to deploy an app without a manifest:
+
+$ cf push
+Run the following command to deploy an app with a manifest:
+
+
+$ cf push --no-start
+Run the following command to push an app with a manifest without starting
+
+$ cf push myapp -d private-domain.example.com --hostname foo
+To customize the route during push, specify the domain using the -d flag and the hostname with the --hostname flag. The following command creates the foo.private-domain.example.com route for myapp:
+
+
+
+$ cf start or st YOUR-APP
+Run the following command to start an app
+
+
+$ cf stop YOUR-APP
+Run the following command to stop an app
+
+$ cf delete YOUR-APP
+Run the following command to delete an app
+
+$ cf rename YOUR-APP NEW-YOUR-APP
+Run the following command to rename an app
+
+
+
+$ cf restart YOUR-APP
+Restart Your Application
+
+$ cf restage YOUR-APP
+Restage Your Application
+
+
+$ cf unmap-route tcp-app private-domain.example.com --hostname myapp --path mypath
+To unmap an HTTP route from an app, identify the route using the hostname, domain, and path
+
+$ cf delete-route private-domain.example.com --hostname myapp --path mypath
+To delete a HTTP route, identify the route using the hostname, domain, and path
+
+
+$ cf revg
+Retrieving the contents of the running environment variable group as
+sampledeveloper@example.com...
+
+$ cf sevg
+Retrieving the contents of the staging environment variable group as
+sampledeveloper@example.com...
+
+$ cf apps
+Getting apps in org SAMPLE-ORG-NAME / space dev as
+sampledeveloper@example.com...
+
+
+$ cf env APP-NAME "tag,uri,url"
+Getting env variables for app APP-NAME in org SAMPLE-ORG-NAME / space dev as
+sampledeveloper@example.com...
+
+$ cf ssevg '{"test":"198.51.100.130","test2":"203.0.113.105"}'
+Setting the contents of the staging environment variable group as admin...
+
+$ cf sevg
+Retrieving the contents of the staging environment variable group as admin...
+
+$ cf revg
+Retrieving the contents of the running environment variable group as admin...
+
+$ cf srevg '{"test3":"2001","test4":"2010"}'
+Setting the contents of the running environment variable group as admin...
+
+$ cf scale myApp -i 5
+Scaling Horizontally
+Horizontally scaling an application creates or destroys instances of your application.
+
+$ cf scale myApp -k 512M or 
+Vertically scaling an application changes the disk space limit that Cloud Foundry applies to all instances of the application.
+Scaling Vertically
+
+$ cf scale myApp -m 1G
+Vertically scaling an application changes the memory limit that Cloud Foundry applies to all instances of the application.
+Scaling Vertically
+
+$ cf logs my-app --recent
+Use the cf logs APP-NAME --recent command to display the recent logs of the application and all its tasks.
+
+$ cf cups SERVICE_INSTANCE -p "host, port, dbname, username, password"
+
+Create a User-Provided Service Instance
+The alias for cf create-user-provided-service is cf cups.
+-p option with a comma-separated list of parameter names.
+
+
+Update user-provided service instance
+$ cf update-user-provided-service SERVICE_INSTANCE -p "comma, separated,parameter, names"
+
+
+
+
