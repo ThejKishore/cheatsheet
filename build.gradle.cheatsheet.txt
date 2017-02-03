@@ -1,0 +1,154 @@
+
+
+
+***All ways create build.gradle file ***
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.4.RELEASE")
+    }
+}
+
+// plugins to be enabled 
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+// for jar file creation
+jar {
+    baseName = 'APPLICATION_NAME'
+    version =  'VERSION_NO'
+}
+
+// For war file creation
+war {
+    baseName = 'APPLICATION_NAME'
+    version =  'VERSION_NO'
+}
+
+//Creating custom tag for creating build wrapper....
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+// dependencies to be retrieved from
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.flywaydb:flyway-core")
+    compile("com.vaadin:vaadin-spring-boot-starter:1.1.1")
+    runtime("com.h2database:h2")
+    runtime("org.springframework.boot:spring-boot-devtools")
+    compile("org.projectlombok:lombok")
+    testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+*** to create wrapper for task like clean , build  etc below command can be used **********
+> gradle wrapper --gradle-version 2.0
+
+Dependency configurations
+-------------------------------------------------------------------------------------------------
+compile
+The dependencies required to compile the production source of the project.
+
+runtime
+The dependencies required by the production classes at runtime. By default, also includes the compile time dependencies.
+
+testCompile
+The dependencies required to compile the test source of the project. By default, also includes the compiled production classes and the compile time dependencies.
+
+testRuntime
+The dependencies required to run the tests. By default, also includes the compile, runtime and test compile dependencies.
+
+
+Tasks
+-------------------------------------------------------------------------------------------------------------------------------
+task compile {
+    doLast {
+        println 'compiling source'
+    }
+}
+
+task compileTest(dependsOn: compile) {
+    doLast {
+        println 'compiling unit tests'
+    }
+}
+
+task test(dependsOn: [compile, compileTest]) {
+    doLast {
+        println 'running unit tests'
+    }
+}
+
+task dist(dependsOn: [compile, test]) {
+    doLast {
+        println 'building the distribution'
+    }
+}
+
+Plugin Tasks :
+ 
+	apply plugin: 'eclipse'
+	apply plugin: 'eclipse-wtp'
+
+		TASKS:
+		-------------------------------------
+		eclipse			all Eclipse configuration file generation tasks	Task	Generates all Eclipse configuration files
+		cleanEclipse		all Eclipse configuration file clean tasks		Delete	Removes all Eclipse configuration files
+		cleanEclipseProject	-							Delete	Removes the .project file.
+		cleanEclipseClasspath	-							Delete	Removes the .classpath file.
+		cleanEclipseJdt		-							Delete	Removes the .settings/org.eclipse.jdt.core.prefs file.
+		eclipseProject		-							GenerateEclipseProject	Generates the .project file.
+		eclipseClasspath	-							GenerateEclipseClasspath	Generates the .classpath file.
+		eclipseJdt		-							GenerateEclipseJdt	Generates the .settings/org.eclipse.jdt.core.prefs file.
+		
+		cleanEclipseWtpComponent	-	Delete	Removes the .settings/org.eclipse.wst.common.component file.
+		cleanEclipseWtpFacet	-	Delete	Removes the .settings/org.eclipse.wst.common.project.facet.core.xml file.
+		eclipseWtpComponent	-	GenerateEclipseWtpComponent	Generates the .settings/org.eclipse.wst.common.component file.
+		eclipseWtpFacet		-	GenerateEclipseWtpFacet	Generates the .settings/org.eclipse.wst.common.project.facet.core.xml file.
+
+
+java :
+-----------
+
+https://docs.gradle.org/current/userguide/java_plugin.html
+
+WAR :
+-----------
+
+https://docs.gradle.org/current/userguide/war_plugin.html
+
+IDEA:
+--------------
+https://docs.gradle.org/current/userguide/idea_plugin.html
+
+
+springboot
+----------------------------
+
+http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html
+
+
+
+
+
+
+
+
+
+
