@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd ">
+
+	<import resource="classpath:jdbc_context.xml"/>
+
+	<context:annotation-config />
+	<mvc:annotation-driven />
+	<context:component-scan base-package="com.kish.svc" />	
+	<cache:annotation-driven />
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<!-- <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> -->
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject">
+			<bean
+				class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+				<property name="targetClass" value="java.lang.System" />
+				<property name="targetMethod" value="getProperties" />
+			</bean>
+		</property>
+		<property name="targetMethod" value="putAll" />
+		<property name="arguments">
+			<util:properties>
+				<prop key="org.apache.cxf.stax.allowInsecureParser">true</prop>
+			</util:properties>
+		</property>
+	</bean>
+
+
+	<!--  EHCache Configuration  -->
+	
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehcache" />
+	</bean>
+	<bean id="ehcache"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehCache.xml" />
+		<property name="shared" value="true" />
+	</bean>
+	
+	
+	<!-- -->
+	<bean id="CxfClientCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager" ref="ehcache" />
+		<property name="cacheName" value="CxfClientCache" />
+	</bean>
+
+	<!-- JNDI Environment Template for weblogic -->
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+		<property name="environment">
+			<props>
+				<prop key="java.naming.factory.initial">
+					weblogic.jndi.WLInitialContextFactory
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!--  DAO configuration -->
+	
+	<bean id="SvcDao" class="com.kish.dao.impl.SvcDaoImpl">
+		<constructor-arg>
+			<ref bean="procdataSource" />
+		</constructor-arg>
+	</bean>
+	
+	
+
+	
+	<!--  task scheduling for purge activity... -->
+  	<bean id="purgeServiceAuditJob" class="com.kish.batch.PurgeServiceAuditJob"></bean>
+  	
+  	<task:scheduled-tasks scheduler="myScheduler">
+
+		<!-- 2:20:00 pm every Saturday execute the executePurgeServiceAudit method... -->
+		<task:scheduled ref="purgeServiceAuditJob" method="executePurgeServiceAudit" cron="0 20 14 ? * SAT"/>
+
+	</task:scheduled-tasks>
+
+	<task:scheduler id="myScheduler" pool-size="10" />
+
+
+	<!--  Wrapper service end-point configuration  -->
+	
+	<jaxws:endpoint id="wrapperws"
+		implementor="com.kish.wrapper.ws.impl.WrapperWSImpl"
+		wsdlLocation="wsdl/wrapperws.wsdl" address="/wrapperws">
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+		</jaxws:features>
+		<jaxws:inInterceptors>
+			<bean class="com.kish.interceptors.CustomInLogInterceptor"></bean>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<bean class="com.kish.interceptors.CustomOutLogInterceptor"></bean>
+		</jaxws:outInterceptors>
+	</jaxws:endpoint>
+
+</beans>
+
+
+<!---- jdbc_context.xml using jndi -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- JNDI Environment Template -->
+	<bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+		<property name="environment">
+			<props>
+				<prop key="java.naming.factory.initial">
+					weblogic.jndi.WLInitialContextFactory
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="procdataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+ 	   <property name="jndiName" value="DataSource"/>
+ 	   <property name="jndiTemplate" ref="jndiTemplate"/>
+	</bean>
+
+</beans>
+
+<!---- jdbc_context.xml another way of using jndi -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/jee
+        http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
+
+    <jee:jndi-lookup id="dataSource" 
+        jndi-name="java:comp/env/dataSource" 
+        expected-type="javax.sql.DataSource" />
+
+</beans>
+
+<!---- jdbc_context.xml without using jndi -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="dataSource"
+        class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        p:driverClassName="org.hsqldb.jdbcDriver"
+        p:url="jdbc:hsqldb:hsql://localhost:9001"
+        p:username="sa"
+        p:password="" /> 
+
+</beans>
+
+ <beans profile="dev">
+        <jdbc:embedded-database id="dataSource">
+            <jdbc:script
+                location="classpath:com/bank/config/sql/schema.sql"/>
+            <jdbc:script
+                location="classpath:com/bank/config/sql/test-data.sql"/>
+        </jdbc:embedded-database>
+    </beans>
+	
+-------------------for tomcat web servers------------------------------------
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="${jdbc.driverClassName}" />
+    <property name="url" value="${jdbc.url}" />
+    <property name="username" value="${jdbc.username}" />
+    <property name="password" value="${jdbc.password}" />
+</bean>
+<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+ <context:property-placeholder location="jdbc.properties"/>
+ 
+--for hibernate
+<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="mappingResources">
+        <list>
+            <value>org/springframework/samples/petclinic/hibernate/petclinic.hbm.xml</value>
+        </list>
+    </property>
+    <property name="hibernateProperties">
+        <value>
+            hibernate.dialect=${hibernate.dialect}
+        </value>
+    </property>
+</bean>
+
+<bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory" />
+</bean>
+
+
+-------------------for application servers------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/jee
+        http://www.springframework.org/schema/jee/spring-jee.xsd">
+
+    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/jpetstore"/>
+
+    <bean id="txManager" class="org.springframework.transaction.jta.JtaTransactionManager" />
+
+    <!-- other <bean/> definitions here -->
+
+</beans>
+
+--for hibernate
+<bean id="txManager" class="org.springframework.transaction.jta.JtaTransactionManager"/>
+
+
+
+-----------------AOP based transaction management -----------------------
+
+<!-- from the file 'context.xml' -->
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- this is the service object that we want to make transactional -->
+    <bean id="fooService" class="x.y.service.DefaultFooService"/>
+
+    <!-- the transactional advice (what 'happens'; see the <aop:advisor/> bean below) -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- ensure that the above transactional advice runs for any execution
+        of an operation defined by the FooService interface -->
+    <aop:config>
+        <aop:pointcut id="fooServiceOperation" expression="execution(* x.y.service.FooService.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/>
+    </aop:config>
+
+    <!-- don't forget the DataSource -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@rj-t42:1521:elvis"/>
+        <property name="username" value="scott"/>
+        <property name="password" value="tiger"/>
+    </bean>
+
+    <!-- similarly, don't forget the PlatformTransactionManager -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- other <bean/> definitions here -->
+
+</beans>
