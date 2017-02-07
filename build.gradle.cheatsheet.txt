@@ -37,6 +37,9 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
 
+//Adding this would enable the passing the arguments lile -Dsrping.profiles.active=default,lcl 
+bootRun.systemProperties = System.properties
+
 // dependencies to be retrieved from
 repositories {
     mavenCentral()
@@ -44,6 +47,14 @@ repositories {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+//Adding the dependency management to download a certain depdendencies etc...
+dependencyManagement {
+	imports {
+		mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Camden.SR4'
+	}
+}
+
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -144,6 +155,14 @@ springboot
 http://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html
 
 
+
+Running the boot to a specific profile.
+---------------------------------------
+gradle bootRun -Dspring.profiles.active=default,lcl
+
+to skip testing :
+-------------------------------------------------------------
+gradle clean jar -Dspring.profiles.active=default,sys -x test
 
 
 
