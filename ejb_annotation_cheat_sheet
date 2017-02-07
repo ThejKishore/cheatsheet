@@ -1,0 +1,65 @@
+Portable JNDI names in EJB 3.1
+Java EE 6 made some efforts to standardize JNDI names at global,application, and module levels. Now EJB deployed to EJB-3.1-capable server will have various standard JNDI names registered. EJB 3.1 spec defines the following 3 levels of JNDI names for EJB:
+
+Global JNDI name:
+	java:global[/<app-name>]/<module-name>/<bean-name>[!<fully-quali-fied-interface-name>]
+
+Application-scope JNDI name:
+	java:app/<module-name>/<bean-name>[!<fully-qualified-interface-name>]
+
+Module-scope JNDI name:
+	java:module/<bean-name>[!<fully-qualified-interface-name>]
+
+The following examples shows various EJB JNDI names, depending upon how the EJB is packaged, its business interface(s), and bean class:
+====================================================================================================================
+
+In a J2EE/JavaEE server, container has always been the backbone for creating and managing the lifecycle of resident components. 
+It's not a surprise to see some forms of DI is already present at the beginning of J2EE. 
+For example, javax.ejb.SessionBean, the legacy interface implemented by old-style EJB bean class, contains a setSessionContext(SessionContext ctx) method, which is called by ejb container to inject a SessionContext to the bean class. Similarly, javax.ejb.EntityBean has setEntityContext(EntityContext ctx), and javax.ejb.MessageDrivenBean has setMessageDrivenContext(MessageDrivenContext ctx) callbacks.
+
+Another less obvious example is Servlet init methods, which are invoked by servlet container to initialize ServletContext and ServletConfig for servlet class:
+
+	//Declared in javax.servlet.Servlet interface and implemented in GenericServlet:
+	public void init(ServletConfig config)
+a
+	//Convenience method implemented in GenericServlet
+	public void init();
+This early forms of DI is typically defined as part of the lifecycle callbacks and strongly typed to a specific interface or abstract class.
+
+DI capability was substantially expanded in Java EE 5 with the introduction of annotation- and xml-based DI. 
+Both field- and setter-injections are supported, and xml deployment descriptors can be used to override or augment annotation meta data.
+Most common ones are:
+	@EJB private Calc calc;
+
+	@EJB(name="ejb/calc", beanName="DefaultCalc", beanInterface=com.my.ejb.Calc.class)
+
+	@Resource SessionContext ctx;
+
+	@Resource private String widgetName;
+
+	@Resource(mappedName="custom/widgetName")
+	private String widgetName;
+
+	@PersistenceContext private EntityManager em;
+
+	@PersistenceContext(unitName="advanced-pu", type=TRANSACTION)
+	private EntityManager em;
+	
+As you can see, the annotation type is specific to each resource type.
+The advantage of this approach is, you can easily customize how a specific type of dependency is constructed and initialized. 
+This design makes sense as some resources need more initialization params than others. 
+But the downside is lack of internal consistency across the board. For each new type of resources, we need to decide whether to reuse the existing annotations, add new attributes to existing annotations, or create a new one. This task is tackled in Java EE 6, with JSR 330 (AtInject spec) and JSR 299 (CDI spec), both are required component specs in Java EE 6 Platform.
+
+Now in Java EE 6, all the above is doable with a single @java.inject.Inject. 
+For injections with no attributes (or default attributes), 
+we can easily replace @EJB/@Resource/@PersistenceContext with @Inject. 
+Otherwise, a @javax.inject.Qualifier is needed to provider more information. 
+Basically we are promoting annotation attributes to auxiliary annotations, replacing string-based qualifiers with typed qualifiers, and chaining them together to resolve the DI.
+
+@EJB and @Resource are also enhanced in Java EE 6 to take an additional portable attribute lookup, mainly as a replacement for the nonportable mappedName attribute:
+	
+	@EJB(lookup="java:global/myApp/myEJBModule/CalcBean")
+	private Calc calc;
+
+	@Resource(lookup="java:module/env/sleepSeconds")
+	private long sleepSeconds;
