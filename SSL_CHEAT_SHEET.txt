@@ -1,0 +1,86 @@
+SSL -----  https://www.youtube.com/watch?v=uxWlxhrwRkA&t=309s
+	Encryption 
+	Identification
+	
+	
+
+	Encryption <-----> Cryptography
+	
+		Private Key Encryption or Symmentric Encryption  (Client and server uses private key to encrypt/decrypt)
+		
+		Public Key Encryption or ASymmentirc Encryption (Client uses public key to encrypt and Server uses Private key to decrypt) 
+		
+	
+	KeyStore
+		Java Key Store (JKS)
+					Oracle Weblogic Server
+					Oracle SOA Suite
+					Oracle WebCenter
+					Oracle Virtual Directory
+					Oracle Identity & Access Management
+		
+		ORACLE Wallet 
+		           Oracle HTTP Server
+				   Oracle Internet Directory
+				   Oracle Web Cache
+				   
+	Key Store type 
+		Identity Store  --- Should be more secure ....
+			Servers Private key
+			Servers Digital Certificate (Server certificates)
+		
+		
+		Trust Store   ---- can be less secure
+			Certification Authoritys Trust certificates 	   -- (Root Certs or intermediate certs)
+			
+		
+Using Java key tool to create certificates:
+=====================================================
+keytool -genkeypair -alias mytestalias -keyalg RSA -keysize 2048 -dname "cn=mycompany.kish.com,c=gb" -keystore <Keystorefilename.jks>
+pasword : Give ur password
+Same for pwd for key store 
+
+keytool -list -v -keystore <keystorefilename.jks>
+
+Creating certificate signing request (CSR) using keytool
+========================================================
+keytool -certreq -v  -alias mytestalias -file <filename.csr> -keystore <keystorefilename.jks>
+password: Give ur password
+
+
+importing the certs to keystore
+-------------------------------------------------------------------------------------------------------------------------------------
+keytool -importcert -file <filename.pem> -alias mytestalias -keystore <keystorefilename.jks>
+
+
+default password for cacerts ----> changeit
+
+
+SSL VS TLS
+
+TLS is predecessor of Secure Sockets Layer
+
+SSL Version
+
+	SSL v1
+	SSL v2
+	SSL v3
+	SSL v3.1  ===== > TLS 1.0
+								 TLS 1.1
+								 TLS 1.2
+								 
+								 
+								 
+				JDK 8                      JDK 7               JDK 6
+				
+TLS 			TLSv1.2_default        TLSv1.2              TLSv1.1
+											   TLSv1_default     TLSv1_default
+https://blogs.oracle.com/java-platform-group/entry/diagnosing_tls_ssl_and_https
+
+
+
+
+
+
+
+		
