@@ -1,0 +1,202 @@
+//Read File Template (readfile)
+${:import(java.io.BufferedReader,  
+           java.io.FileNotFoundException,  
+           java.io.FileReader,  
+           java.io.IOException)}  
+ BufferedReader in = null;  
+ try {  
+    in = new BufferedReader(new FileReader(${fileName}));  
+    String line;  
+    while ((line = in.readLine()) != null) {  
+       ${process}  
+    }  
+ }  
+ catch (FileNotFoundException e) {  
+    logger.error(e) ;  
+ }  
+ catch (IOException e) {  
+    logger.error(e) ;  
+ } finally {  
+    if(in != null) in.close();  
+ }  
+
+//write file template (writefile)
+${:import(java.nio.file.Files,
+          java.nio.file.Paths,
+          java.nio.Charset,
+          java.io.IOException,
+          java.io.BufferedWriter)}
+try (BufferedWriter out = Files.newBufferedWriter(Paths.get(${fileName:var(String)}),
+                                                  Charset.forName("UTF-8"))) {
+    out.write(${string:var(String)});
+    out.newLine();
+    ${cursor}
+} catch (IOException e) {
+    // ${todo}: handle exception
+}
+
+//for each in map (formap)
+
+${:import(java.util.Map.Entry)}
+for (Entry<${keyType:argType(map, 0)}, ${valueType:argType(map, 1)}> ${entry} : ${map:var(java.util.Map)}.entrySet())
+{
+    ${keyType} ${key} = ${entry}.getKey();
+    ${valueType} ${value} = ${entry}.getValue();
+    ${cursor}
+}
+
+//Create a singleton using ENUMS :(createsingleton)
+
+static enum Singleton {
+    INSTANCE;
+
+    private static final ${enclosing_type} singleton = new ${enclosing_type}();
+
+    public ${enclosing_type} getSingleton() {
+        return singleton;
+    }
+}
+${cursor}
+
+//Using a singleton : (getSingleton)
+${type} ${newName} = ${type}.Singleton.INSTANCE.getSingleton();
+
+
+//system out with the class and method name: systrace
+
+System.out.println("${enclosing_type}.${enclosing_method}()");
+
+
+
+
+//slf4j logger:(slf4j)
+
+${:import(org.slf4j.Logger,
+          org.slf4j.LoggerFactory)}
+private static final Logger LOGGER =
+       LoggerFactory.getLogger(${enclosing_type}.class);
+
+//log debug (logd)
+if(LOGGER.isDebugEnabled())
+     LOGGER.debug(${word_selection}${});
+${cursor}
+
+//log info (logi)
+LOGGER.info(${word_selection}${});
+${cursor}
+
+//log error (loge)
+
+LOGGER.error(${word_selection}${}, ${exception_variable_name});
+
+
+//log error and throw (logt) 
+
+LOGGER.error(${word_selection}${}, ${exception_variable_name});
+throw ${exception_variable_name};
+${cursor}
+
+
+//JUNIt 
+
+//before  setup (before)
+
+${:import (org.junit.Before)}
+ 
+@Before
+public void setUp() {
+    ${cursor}
+}
+
+
+// after run (after)
+
+${:import (org.junit.After)}
+ 
+@After
+public void tearDown() {
+    ${cursor}
+}
+
+//before class (beforeclass)
+
+${:import (org.junit.BeforeClass)}
+ 
+@BeforeClass
+public static void oneTimeSetUp() {
+    // one-time initialization code
+    ${cursor}
+}
+
+//after class (afterclass) 
+ 
+
+${:import (org.junit.AfterClass)}
+ 
+@AfterClass
+public static void oneTimeTearDown() {
+    // one-time cleanup code
+    ${cursor}
+}
+
+
+
+//Spring boot commandline runner (cmdlr)
+
+${:import(java.util.Arrays,
+          org.springframework.boot.CommandLineRunner,
+          org.springframework.context.annotation.Bean,
+          org.springframework.context.ApplicationContext)}
+
+    @Bean
+	CommandLineRunner commandLineRunner(ApplicationContext context) {
+		return (args) -> {
+			Arrays.asList(context.getBeanDefinitionNames()).stream().forEach(System.out::println);
+		};
+	}
+
+//gradle init 
+
+gradle init --type java-library
+
+// Gradle spring boot init (bootinit)
+
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = '${cursor}'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	runtime('com.h2database:h2')
+	compileOnly('org.projectlombok:lombok')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+// getting the gradle home directory
+
+
+task getHomeDir << {
+    println gradle.gradleHomeDir
+}
