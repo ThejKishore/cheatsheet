@@ -1,0 +1,924 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="boot" deleted="false" description="Stub that creates the get request with the path variable" enabled="true" name="getsvc">${x:import(org.springframework.web.bind.annotation.GetMapping, org.springframework.web.bind.annotation.PathVariable,org.springframework.http.ResponseEntity,org.springframework.web.bind.annotation.RestController)}
+/*
+compile('org.springframework.boot:spring-boot-starter-web')
+don't forget to add the @RestController at the Class level
+*/
+@GetMapping(value="${path}/{${param}}")
+public ResponseEntity&lt;${SomeData}&gt; ${getMethodName}(@PathVariable(value="${param}") ${String} ${param}) {
+	return ResponseEntity.ok(new ${SomeData}(${cursor}));
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="Spring Boot main method" enabled="true" id="org.springframework.ide.eclipse.boot.templates.main" name="main">
+public static void main(String[] args) throws Exception {
+        SpringApplication.run(${enclosing_type}.class, args);
+}${:import(org.springframework.boot.SpringApplication)}
+</template><template autoinsert="true" context="boot-members" deleted="false" description="JUnit MockMvc with WebApplicationContext setup" enabled="true" id="org.springframework.ide.eclipse.boot.templates.jumockmvcwac" name="jumockmvcwac">
+${standardImports:import(org.junit.Before,org.springframework.beans.factory.annotation.Autowired,org.springframework.test.web.servlet.MockMvc,org.springframework.test.web.servlet.setup.MockMvcBuilders,org.springframework.web.context.WebApplicationContext)}
+${:importStatic('org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*','org.springframework.test.web.servlet.result.MockMvcResultHandlers.*','org.springframework.test.web.servlet.result.MockMvcResultMatchers.*')}
+
+    @Autowired
+    WebApplicationContext context;
+    
+    MockMvc mockMvc;
+    
+    @Before
+    public void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+    }
+</template><template autoinsert="true" context="boot-members" deleted="false" description="static Logger field using slf4j" enabled="true" id="org.springframework.ide.eclipse.boot.templates.slf4j.logger" name="logger">
+${:import(org.slf4j.Logger,org.slf4j.LoggerFactory)}
+private static final Logger ${log} = LoggerFactory.getLogger(${enclosing_type}.class);
+</template><template autoinsert="true" context="boot-members" deleted="false" description="RequestMapping method" enabled="true" id="org.springframework.ide.eclipse.boot.templates.RequestMapping" name="reqmapsvc">${x:import(org.springframework.web.bind.annotation.RequestMapping, org.springframework.web.bind.annotation.RequestMethod, org.springframework.web.bind.annotation.RequestParam)}@RequestMapping(value="${path}", method=RequestMethod.${GET})
+public ${SomeData} ${requestMethodName}(@RequestParam ${String} ${param}) {
+	return new ${SomeData}(${cursor});
+}
+</template><template autoinsert="true" context="boot-members" deleted="false" description="Creating a datasource with the tomcat pooling in boot application" enabled="true" name="datasource">${:import(org.springframework.beans.factory.annotation.Value,
+          org.springframework.context.annotation.Bean,
+          org.springframework.context.annotation.Configuration,
+          org.springframework.context.annotation.Primary,
+          javax.sql.DataSource)}
+
+/* 
+@Configuration -- don't forget to add the annotation in class level.
+***
+	compile('org.springframework.boot:spring-boot-starter-jdbc')
+	// https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc
+	compile ('org.apache.tomcat:tomcat-jdbc:8.5.29')
+	runtime('com.h2database:h2')
+
+***
+	 *  
+edw.datasource.url=jdbc:h2:~/test
+ edw.datasource.driverClassName=org.h2.Driver
+ edw.datasource.username=sa
+ edw.datasource.password=
+ edw.datasource.maxIdle=10
+ edw.datasource.maxActive=10
+ edw.datasource.minIdle=5
+ edw.datasource.testOnBorrow=false
+ edw.datasource.testOnConnect=false
+ edw.datasource.testOnReturn=false
+ edw.datasource.validationQuery=select 1
+ edw.datasource.validationQueryTimeOut=2
+ edw.datasource.validationInterval=10000
+ edw.datasource.jdbcInterceptor=StatementFinalizer;SlowQueryReport(logFailed=true)
+	 */
+
+    @Value("$${edw.datasource.driverClassName}")
+    public String driverClassName;
+
+    @Value("$${edw.datasource.url}")
+    public String url;
+
+    @Value("$${edw.datasource.username}")
+    public String username;
+
+    @Value("$${edw.datasource.password}")
+    public String password;
+
+    @Value("$${edw.datasource.maxActive}")
+    public int maxActive;
+
+    @Value("$${edw.datasource.maxIdle}")
+    public int maxIdle;
+
+    @Value("$${edw.datasource.minIdle}")
+    public int minIdle;
+
+    @Value("$${edw.datasource.testOnBorrow}")
+    public boolean testOnBorrow;
+
+    @Value("$${edw.datasource.testOnConnect}")
+    public boolean testOnConnect;
+
+    @Value("$${edw.datasource.testOnReturn}")
+    public boolean testOnReturn;
+
+    @Value("$${edw.datasource.validationQuery}")
+    public String validationQuery;
+
+    @Value("$${edw.datasource.validationQueryTimeOut}")
+    public int validationQueryTimeOut;
+
+    @Value("$${edw.datasource.jdbcInterceptor}")
+    public String  jdbcInterceptor;
+
+    @Value("$${edw.datasource.validationInterval}")
+    public long validationInterval;
+
+    @Bean("beanName")
+    @Primary
+    public DataSource dataSource(){
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.driverClassName(driverClassName).url(url).type(org.apache.tomcat.jdbc.pool.DataSource.class).username(username).password(password);
+        DataSource ds = dataSourceBuilder.build();
+        setTomcatDataSource(ds);
+        return ds;
+    }
+
+    private void setTomcatDataSource(DataSource ds){
+        org.apache.tomcat.jdbc.pool.DataSource tomcatDatasource =  (org.apache.tomcat.jdbc.pool.DataSource)ds;
+        tomcatDatasource.setMaxActive(maxActive);
+        tomcatDatasource.setMaxIdle(maxIdle);
+        tomcatDatasource.setMinIdle(minIdle);
+        tomcatDatasource.setJdbcInterceptors(jdbcInterceptor);
+        tomcatDatasource.setTestOnBorrow(testOnBorrow);
+        tomcatDatasource.setTestOnReturn(testOnReturn);
+        tomcatDatasource.setValidationQuery(validationQuery);
+        tomcatDatasource.setValidationQueryTimeout(validationQueryTimeOut);
+        tomcatDatasource.setValidationInterval(validationInterval);
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="Stub to create a http get service in restcontroller" enabled="true" name="getsvc">${x:import(org.springframework.web.bind.annotation.GetMapping, org.springframework.web.bind.annotation.RequestParam,org.springframework.http.ResponseEntity,org.springframework.web.bind.annotation.RestController)}
+
+/*
+compile('org.springframework.boot:spring-boot-starter-web')
+don't forget to add the @RestController at the Class level
+*/
+
+@GetMapping(value="${path}")
+public ResponseEntity&lt;${SomeData}&gt; ${getMethodName}(@RequestParam("${param}") ${String} ${param}) {
+	return ResponseEntity.ok(new ${SomeData}(${cursor}));
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="creating a post service stub in the rest controller class" enabled="true" name="postsvc">${x:import(org.springframework.web.bind.annotation.PostMapping, org.springframework.web.bind.annotation.RequestBody,org.springframework.http.ResponseEntity)}
+/*
+	compile('org.springframework.boot:spring-boot-starter-web')
+  don't forget to add the @RestController at the Class level
+*/
+@PostMapping(value="${path}")
+public ResponseEntity&lt;${SomeEntityData}&gt; ${postMethodName}(@RequestBody ${SomeEntityData} ${entity}) {
+	//TODO: process POST request
+	${cursor}
+	return ResponseEntity.ok(${entity});
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="creating a put rest service stub in the rest controller" enabled="true" name="putsvc">${x:import(org.springframework.web.bind.annotation.PutMapping, org.springframework.web.bind.annotation.RequestBody,org.springframework.http.ResponseEntity, org.springframework.web.bind.annotation.PathVariable)}
+/*
+	compile('org.springframework.boot:spring-boot-starter-web')
+  don't forget to add the @RestController at the Class level
+*/
+@PutMapping(value="${path}/{${id}}")
+public ResponseEntity&lt;${SomeEntityData}&gt; ${putMethodName}(@PathVariable ${pvt:link(String,int,long)} ${id}, @RequestBody ${SomeEntityData} ${entity}) {
+	//TODO: process PUT request
+	${cursor}
+	return ${entity};
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="creating the delete rest service stub in the rest controller" enabled="true" name="delsvc">${x:import(org.springframework.web.bind.annotation.DeleteMapping, org.springframework.web.bind.annotation.PathVariable)}
+/*
+	compile('org.springframework.boot:spring-boot-starter-web')
+  don't forget to add the @RestController at the Class level
+*/
+@DeleteMapping(value="${path}/{${id}}")
+public ${r:link(String)} ${deleteMethodName}(@PathVariable ${pv:link(String,int,long)} ${id}) {
+	//TODO: process DELETE request
+	${cursor}
+	return "${Success}";
+}</template><template autoinsert="true" context="boot-members" deleted="false" description="Creating a rest template helper class with all the GET,POST,PUT,DELETE methods...." enabled="true" name="resttemplatehelper">
+${x: import (
+java.io.BufferedReader,
+java.io.IOException,
+java.io.InputStreamReader,
+java.util.ArrayList,
+java.util.List,
+java.util.Map,
+java.util.Map.Entry,
+javax.annotation.PostConstruct,
+org.slf4j.Logger,
+org.slf4j.LoggerFactory,
+org.springframework.http.HttpEntity,
+org.springframework.http.HttpMethod,
+org.springframework.http.HttpRequest,
+org.springframework.http.HttpStatus,
+org.springframework.http.ResponseEntity,
+org.springframework.http.client.BufferingClientHttpRequestFactory,
+org.springframework.http.client.ClientHttpRequestExecution,
+org.springframework.http.client.ClientHttpRequestFactory,
+org.springframework.http.client.ClientHttpRequestInterceptor,
+org.springframework.http.client.ClientHttpResponse,
+org.springframework.http.client.HttpComponentsClientHttpRequestFactory,
+org.springframework.stereotype.Component,
+org.springframework.web.client.RestClientException,
+org.springframework.web.client.RestTemplate
+)}
+
+/*
+Don't forget to add @Component annotation at class level
+@Component
+*/
+	
+	
+	private static final Logger log = LoggerFactory.getLogger(${enclosing_type}.class);
+	
+	RestTemplate restTemplate ;
+
+	@PostConstruct
+	public void init() {
+		restTemplate = restTemplate();
+	}
+	
+	public &lt;T,U&gt; ResponseEntity&lt;T&gt; postRequest(String url,U u,Class&lt;T&gt; classType,Map&lt;String,String&gt; headers,Map&lt;String,Object&gt; uriconstruct){
+		HttpEntity entityToBeSent = createEntity(u, headers);
+		return  exchange(url, classType, uriconstruct, entityToBeSent,HttpMethod.POST);
+	}
+	
+	public &lt;T&gt; ResponseEntity&lt;T&gt; getRequest(String url,Class&lt;T&gt; classType,Map&lt;String,String&gt; headers,Map&lt;String,Object&gt; uriconstruct){
+		HttpEntity	entityToBeSent = createEntity(null, headers);
+		return  exchange(url, classType, uriconstruct, entityToBeSent,HttpMethod.GET);
+	}
+
+	
+	public &lt;T,U&gt; ResponseEntity&lt;T&gt; putRequest(String url,U u,Class&lt;T&gt; classType,Map&lt;String,String&gt; headers,Map&lt;String,Object&gt; uriconstruct){
+		HttpEntity entityToBeSent = createEntity(u, headers);
+		return  exchange(url, classType, uriconstruct, entityToBeSent,HttpMethod.PUT);
+	}
+
+	
+	public &lt;T,U&gt; ResponseEntity&lt;T&gt; deleteRequest(String url,U u,Class&lt;T&gt; classType,Map&lt;String,String&gt; headers,Map&lt;String,Object&gt; uriconstruct){
+		HttpEntity entityToBeSent = createEntity(u, headers);
+		return exchange(url, classType, uriconstruct, entityToBeSent,HttpMethod.DELETE);
+	}
+
+	private &lt;U&gt; HttpEntity createEntity(U u, Map&lt;String, String&gt; headers) {
+		HttpEntity entityToBeSent = null;
+		if(u != null) {
+			entityToBeSent = new HttpEntity&lt;U&gt;(u);
+		}
+		else {
+			entityToBeSent = new HttpEntity&lt;Void&gt;((Void) null);
+		}
+		
+		if(headers != null &amp;&amp; !headers.isEmpty()) {
+			for (Entry&lt;String, String&gt; entry : headers.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				entityToBeSent.getHeaders().add(key,value);	
+			}
+		}
+		return entityToBeSent;
+	}
+
+	private &lt;T&gt; ResponseEntity&lt;T&gt; exchange(String url, Class&lt;T&gt; classType, Map&lt;String, Object&gt; uriconstruct,HttpEntity entityToBeSent,HttpMethod httpMethod) {
+		ResponseEntity&lt;T&gt; response = null;
+		try {
+			if(uriconstruct != null &amp;&amp; !uriconstruct.isEmpty()) {
+				response = restTemplate.exchange(url,httpMethod,entityToBeSent,classType,uriconstruct);
+			} else {
+				response = restTemplate.exchange(url,httpMethod,entityToBeSent,classType);	
+			}
+			if(response.getStatusCode() == HttpStatus.ACCEPTED) {
+				log.info("Successfully retrieved the data {} ",response.getBody());
+			}
+		}catch (RestClientException e) {
+			log.error("message", e);
+		}
+		return response;
+	}
+
+	
+	
+	
+	private RestTemplate restTemplate() {
+		RestTemplate restTemplate =  new RestTemplate(clientHttpRequestFactory());
+		List&lt;ClientHttpRequestInterceptor&gt; interceptors = new ArrayList&lt;&gt;();
+		interceptors.add(new LoggingRequestInterceptor());
+		restTemplate.setInterceptors(interceptors);
+		return restTemplate;
+	}
+
+
+
+	private ClientHttpRequestFactory clientHttpRequestFactory() {
+		HttpComponentsClientHttpRequestFactory httpFactory = new HttpComponentsClientHttpRequestFactory();
+		httpFactory.setReadTimeout(2000);
+		httpFactory.setConnectTimeout(2000);
+		return new BufferingClientHttpRequestFactory(httpFactory);
+	}   
+	
+	private class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+			traceRequest(request, body);
+			ClientHttpResponse response = execution.execute(request, body);
+			traceResponse(response);
+			return response;
+		}
+
+		private void traceRequest(HttpRequest request, byte[] body) throws IOException {
+			log.debug("===========================request begin================================================");
+			log.debug("URI         : {}", request.getURI());
+			log.debug("Method      : {}", request.getMethod());
+			log.debug("Headers     : {}", request.getHeaders() );
+			log.debug("Request body: {}", new String(body, "UTF-8"));
+			log.debug("==========================request end================================================");
+		}
+
+		private void traceResponse(ClientHttpResponse response) throws IOException {
+			StringBuilder inputStringBuilder = new StringBuilder();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody(), "UTF-8"));
+			String line = bufferedReader.readLine();
+			while (line != null) {
+				inputStringBuilder.append(line);
+				inputStringBuilder.append('\n');
+				line = bufferedReader.readLine();
+			}
+			log.debug("============================response begin==========================================");
+			log.debug("Status code  : {}", response.getStatusCode());
+			log.debug("Status text  : {}", response.getStatusText());
+			log.debug("Headers      : {}", response.getHeaders());
+			log.debug("Response body: {}", inputStringBuilder.toString());
+			log.debug("=======================response end=================================================");
+		}
+	}
+
+
+</template><template autoinsert="true" context="boot-members" deleted="false" description="Logging incoming request and outgoing response for audit purpose" enabled="true" name="restaudit">${x: import (
+org.aspectj.lang.JoinPoint,
+org.aspectj.lang.annotation.AfterReturning,
+org.aspectj.lang.annotation.AfterThrowing,
+org.aspectj.lang.annotation.Aspect,
+org.aspectj.lang.annotation.Before,
+org.slf4j.Logger,
+org.slf4j.LoggerFactory,
+org.springframework.stereotype.Component,
+org.springframework.web.context.request.RequestContextHolder,
+org.springframework.web.context.request.ServletRequestAttributes,
+javax.servlet.http.HttpServletRequest,
+javax.servlet.http.HttpServletResponse,
+java.util.Arrays)}
+
+
+	
+	/*
+	 * Dont forget to add @Component and @Aspect at the class level
+	 */
+
+	
+	private static final Logger log = LoggerFactory.getLogger(${enclosing_type}.class);
+
+ // give package name where the controller resides example com.kish.services.CustomerController
+
+	@Before("execution(public * *Contoller*(..))")
+	public void logBeforeCall(JoinPoint jp){
+		log.info("before calling the functions {}", jp.getSignature()) ;
+		log.info("Args {} ", Arrays.toString(jp.getArgs()));
+
+	}
+
+
+	@AfterReturning(value = "execution(public * *Contoller*(..))", returning = "returnedValue")
+	public void logBeforeReturningResult(JoinPoint jp, Object returnedValue) {
+		log.info("after calling the functions {}", jp.getSignature());
+		log.info("response returned  {} ", returnedValue);
+
+	}
+
+	@AfterThrowing(value = "execution(public * *Contoller*(..))", throwing = "e")
+	public void logBeforeReturningWithError(JoinPoint jp, Exception e) {
+		log.info("before calling the functions {}", jp.getSignature());
+		log.info("Exception returned  {} ", e.getCause());
+
+	}
+
+	//Additional methods for getting
+
+	private HttpServletRequest getHttpServletRequest(){
+		return ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+	}
+
+
+	private HttpServletResponse getHttpServletResponse(){
+		return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getResponse();
+	}
+</template><template autoinsert="true" context="boot-members" deleted="false" description="adding the rest controller advice for the project" enabled="true" name="restadvice">${x: import (org.springframework.http.ResponseEntity,
+org.springframework.web.bind.annotation.ExceptionHandler,
+org.springframework.web.bind.annotation.RestControllerAdvice)}
+
+/*
+Don't forget to add the @RestControllerAdvice at the class level
+@RestControllerAdvice
+*/
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity handleNotFoundExcpetion(Exception ex){
+		ResponseEntity rs = ResponseEntity.status(500).body(ex.getCause());
+		return rs;
+	}
+</template><template autoinsert="true" context="boot-members" deleted="false" description="Redis configuration setup  to local host......" enabled="true" name="redissetup">
+${x: import (
+org.springframework.cache.CacheManager,
+org.springframework.context.annotation.Bean,
+org.springframework.context.annotation.Configuration,
+org.springframework.context.annotation.Profile,
+org.springframework.data.redis.cache.RedisCacheManager,
+org.springframework.data.redis.connection.RedisConnectionFactory,
+org.springframework.data.redis.connection.jedis.JedisConnectionFactory,
+org.springframework.data.redis.core.RedisTemplate)}
+
+/**
+don't forget to add below at Configuration annotation....
+@Configuration
+@Profile("Redis")
+*/
+
+    @Bean
+    public JedisConnectionFactory redisConnectionFactory() {
+        JedisConnectionFactory redisConnectionFactory = new JedisConnectionFactory();
+
+        // Defaults
+        redisConnectionFactory.setHostName("127.0.0.1");
+        redisConnectionFactory.setPort(6379);
+        return redisConnectionFactory;
+    }
+
+    @Bean
+    public RedisTemplate&lt;String, String&gt; redisTemplate(RedisConnectionFactory cf) {
+        RedisTemplate&lt;String, String&gt; redisTemplate = new RedisTemplate&lt;String, String&gt;();
+        redisTemplate.setConnectionFactory(cf);
+        return redisTemplate;
+    }
+
+    @Bean
+    public CacheManager cacheManager(RedisTemplate redisTemplate) {
+        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+        // Number of seconds before expiration. Defaults to unlimited (0)
+        cacheManager.setDefaultExpiration(300);
+        return cacheManager;
+    }</template><template autoinsert="true" context="boot-members" deleted="false" description="add gradle boot    dependency for web" enabled="true" name="gbwebd">  /*
+  compile('org.springframework.boot:spring-boot-starter-web')
+  */</template><template autoinsert="true" context="boot-members" deleted="false" description="add gradle boot cache dependency" enabled="true" name="gbcached">  /*
+  compile('org.springframework.boot:spring-boot-starter-cache')
+  */</template><template autoinsert="true" context="boot-members" deleted="false" description="adding gradle boot dependency for jpa...." enabled="true" name="gbjpad">/*
+compile('org.springframework.boot:spring-boot-starter-data-jpa')
+compile ('org.apache.tomcat:tomcat-jdbc:8.5.29')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="adding gradle boot jdbc dependency" enabled="true" name="gbjdbcd">/*
+compile('org.springframework.boot:spring-boot-starter-data-jdbc')
+compile ('org.apache.tomcat:tomcat-jdbc:8.5.29')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="adding gradle boot lombok dependency" enabled="true" name="gblombokd">/*
+  compileOnly('org.projectlombok:lombok')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot aop dependency" enabled="true" name="gbaopd">/*
+	compile('org.springframework.boot:spring-boot-starter-aop')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot redis dependency" enabled="true" name="gbredisd">/*
+	compile('org.springframework.boot:spring-boot-starter-data-redis')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot h2 dependency" enabled="true" name="gbh2d">/*
+  runtime('com.h2database:h2')
+
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot flyway dependency" enabled="true" name="gbflywayd"> /*
+ compile('org.flywaydb:flyway-core')
+*/
+</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot test dependency" enabled="true" name="gbtestd">/*
+  testCompile('org.springframework.boot:spring-boot-starter-test')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot security dependency" enabled="true" name="gbsecd">/*
+compile('org.springframework.boot:spring-boot-starter-security')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot  OAuth dependency" enabled="true" name="gboauthd">/*
+compile('org.springframework.cloud:spring-cloud-starter-oauth2')
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot init ... sample gradle to kick start the spring boot project" enabled="true" name="gbinit">/*
+buildscript {
+	ext {
+		springBootVersion = '1.5.10.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+group = '$${group.id}'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	compile('org.springframework.boot:spring-boot-starter-cache')
+    compile('org.springframework.boot:spring-boot-starter-data-redis')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	runtime('org.springframework.boot:spring-boot-devtools')
+	runtime('com.h2database:h2')
+	compileOnly('org.projectlombok:lombok')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+*/</template><template autoinsert="true" context="boot-members" deleted="false" description="gradle boot cloud init for build.gradle" enabled="true" name="gbcloudinit">/*
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.10.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+group = '$${group.id}'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+ext {
+    springCloudVersion = 'Edgware.SR1'
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$${springCloudVersion}"
+    }
+}
+
+dependencies {
+
+    //web
+    compile 'org.springframework.boot:spring-boot-starter-web'
+  
+    //h2 database
+    runtime 'com.h2database:h2'
+
+    //boot-jpa
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //AOP
+    compile 'org.springframework.boot:spring-boot-starter-aop'
+
+    //cache
+    compile'org.springframework.boot:spring-boot-starter-cache'
+    
+    //redis cache
+    compile 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //Eureka server details
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka-server'
+
+    //lombok
+    compileOnly 'org.projectlombok:lombok'
+
+    //test
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+
+}
+*/</template><template autoinsert="true" context="boot-statements" deleted="false" description="log an INFO message using slf4jlogger declared in this class" enabled="true" id="org.springframework.ide.eclipse.boot.templates.slf4j.loginfo" name="logi">
+    ${log:field(org.slf4j.Logger)}.info("${message}");
+</template><template autoinsert="true" context="boot-statements" deleted="false" description="log an ERROR message using slf4jlogger declared in this class" enabled="true" id="org.springframework.ide.eclipse.boot.templates.slf4j.logerror" name="loge">
+    ${log:field(org.slf4j.Logger)}.error("${message}", ${exception:var(java.lang.Throwable)});
+</template><template autoinsert="true" context="boot-statements" deleted="false" description="log a WARNING using slf4jlogger declared in this class" enabled="true" id="org.springframework.ide.eclipse.boot.templates.slf4j.logwarn" name="logw">
+    ${log:field(org.slf4j.Logger)}.warn("${warning}");
+</template><template autoinsert="true" context="boot-statements" deleted="false" description="log an DEBUG message using slf4jlogger declared in this class" enabled="true" id="org.springframework.ide.eclipse.boot.templates.slf4j.logdebug" name="logd">
+    ${log:field(org.slf4j.Logger)}.debug("${message}");
+</template><template autoinsert="true" context="boot-statements" deleted="false" description="Call restTemplate.exchange" enabled="true" id="org.springframework.ide.eclipse.boot.templates.rtexchange" name="rtex">
+${:import(org.springframework.core.ParameterizedTypeReference,org.springframework.hateoas.PagedResources,org.springframework.http.HttpEntity,org.springframework.http.HttpMethod,org.springframework.http.ResponseEntity)}
+ResponseEntity&lt;PagedResources&lt;?&gt;&gt; result = ${restTemplate:var(org.springframework.web.client.RestTemplate)}.exchange("", 
+     HttpMethod.GET, 
+     new HttpEntity&lt;Void&gt;((Void) null),
+     new ParameterizedTypeReference&lt;PagedResources&lt;${cursor}&gt;&gt;() {});
+</template><template autoinsert="true" context="java" deleted="false" description="Disable formatter with formatter:off/on tags" enabled="true" id="org.springframework.ide.eclipse.boot.templates.noformat" name="formatter-off">
+// @formatter:off
+${cursor} ${line_selection}
+// @formatter:on
+</template><template autoinsert="true" context="java" deleted="false" description="Read file code template" enabled="true" name="readfile">${:import(java.io.BufferedReader,  
+           java.io.FileNotFoundException,  
+           java.io.FileReader,  
+           java.io.IOException)}  
+ BufferedReader in = null;  
+ try {  
+    in = new BufferedReader(new FileReader(${fileName}));  
+    String line;  
+    while ((line = in.readLine()) != null) {  
+       ${process}  
+    }  
+ }  
+ catch (FileNotFoundException e) {  
+    logger.error(e) ;  
+ }  
+ catch (IOException e) {  
+    logger.error(e) ;  
+ } finally {  
+    if(in != null) in.close();  
+ }  </template><template autoinsert="true" context="java" deleted="false" description="Command line Runner ---- " enabled="true" name="cmdlr">${:import(java.util.Arrays,
+          org.springframework.boot.CommandLineRunner,
+          org.springframework.context.annotation.Bean,
+          org.springframework.context.ApplicationContext)}
+
+    @Bean
+	CommandLineRunner commandLineRunner(ApplicationContext context) {
+		return (args) -&gt; {
+			Arrays.asList(context.getBeanDefinitionNames()).stream().forEach(System.out::println);
+		};
+	}</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="slf4j">${:import(org.slf4j.Logger,
+          org.slf4j.LoggerFactory)}
+private static final Logger LOGGER =
+       LoggerFactory.getLogger(${enclosing_type}.class);</template><template autoinsert="true" context="java" deleted="false" description="Write file logic" enabled="true" name="writefile">${:import(java.nio.file.Files,
+          java.nio.file.Paths,
+          java.nio.Charset,
+          java.io.IOException,
+          java.io.BufferedWriter)}
+try (BufferedWriter out = Files.newBufferedWriter(Paths.get(${fileName:var(String)}),
+                                                  Charset.forName("UTF-8"))) {
+    out.write(${string:var(String)});
+    out.newLine();
+    ${cursor}
+} catch (IOException e) {
+    // ${todo}: handle exception
+}
+</template><template autoinsert="true" context="java" deleted="false" description="for each for Map datastructure" enabled="true" name="formap">${:import(java.util.Map.Entry)}
+for (Entry&lt;${keyType:argType(map, 0)}, ${valueType:argType(map, 1)}&gt; ${entry} : ${map:var(java.util.Map)}.entrySet())
+{
+    ${keyType} ${key} = ${entry}.getKey();
+    ${valueType} ${value} = ${entry}.getValue();
+    ${cursor}
+}</template><template autoinsert="true" context="java" deleted="false" description="Creating singleton instance using enum" enabled="true" name="createsingleton">static enum Singleton {
+    INSTANCE;
+
+    private static final ${enclosing_type} singleton = new ${enclosing_type}();
+
+    public ${enclosing_type} getSingleton() {
+        return singleton;
+    }
+}
+${cursor}</template><template autoinsert="true" context="java" deleted="false" description="creating the 2way ssl Socket Factory that could be used in code" enabled="true" name="2wayssl">
+
+${x:import ( 'javax.net.ssl.*',
+org.slf4j.Logger,
+org.slf4j.LoggerFactory,
+java.io.File,
+java.io.FileInputStream,
+java.io.IOException,
+java.net.Socket,
+'java.security.*',
+java.security.cert.CertificateException,
+java.security.cert.X509Certificate,
+java.util.Properties)};
+
+
+
+	
+	private static final Logger log = LoggerFactory.getLogger(${enclosing_type}.class);
+
+	
+	private static Properties properties = new Properties();
+
+	
+
+	static{
+		try{
+			log.info("before the ssl properties loading");
+			properties.load(${enclosing_type}.class.getClassLoader().getResourceAsStream("${enclosing_type}_configuration.properties"));
+			log.info("loaded the properties");
+		}catch (IOException e)
+		{
+			log.error("IOException ...... ",e);
+		}
+	}
+
+
+	private static Boolean sslDebug = Boolean.FALSE;
+
+	public static SSLSocketFactory getCustomSSLSocketFactory() throws RuntimeException{
+
+		final String identityStoreFile =  properties.getProperty("server.ssl.identity.key.store.file");
+		final String identityKeyPwd = properties.getProperty("server.ssl.identity.key.store.password");
+
+		final String trustStoreFile = properties.getProperty("server.ssl.trust.key.store.file");
+		final String trustStorePwd = properties.getProperty("server.ssl.trust.key.store.password");
+
+		final String aliasName = properties.getProperty("alias.name");
+
+		final Boolean runLocal = Boolean.parseBoolean(properties.getProperty("running.local"));
+
+		final String sslProtocol = properties.getProperty("server.ssl.protocol");
+
+		sslDebug = Boolean.parseBoolean(properties.getProperty("server.ssl.debug.enabled","false"));
+
+		final char[] identityKeypwdArray = identityKeyPwd.toCharArray();
+		final char[] trustStorePwdArray = trustStorePwd.toCharArray();
+
+		if(sslDebug){
+			System.setProperty("javax.net.debug","ALL");
+			System.setProperty("ssl.debug","true");
+		}
+
+
+		SSLContext sslCtx = null;
+		try{
+
+
+			sslCtx = SSLContext.getInstance(sslProtocol);
+
+			KeyStore trustStore = KeyStore.getInstance("JKS");
+			if(runLocal){
+				trustStore.load(new FileInputStream(new File(trustStoreFile)),null);
+			} else{
+				trustStore.load(new FileInputStream(new File(trustStoreFile)),trustStorePwdArray);
+			}
+
+			log.info("trustStore loaded successfully");
+
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			tmf.init(trustStore);
+
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(new FileInputStream(new File(identityStoreFile)),identityKeypwdArray);
+
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+
+			kmf.init(keyStore,identityKeypwdArray);
+			KeyManager[] keyManagers = kmf.getKeyManagers();
+
+
+			log.info("Inside ${NAME} keyManagers length"+keyManagers.length);
+
+			for (int i = 0; i &lt; keyManagers.length; i++) {
+				if(keyManagers[i] instanceof X509KeyManager){
+					keyManagers[i] = new KeyManagerBasedOnAlias((X509KeyManager) keyManagers[i],aliasName);
+				}
+			}
+
+			sslCtx.init(keyManagers,tmf.getTrustManagers(),new SecureRandom());
+			SSLContext.setDefault(sslCtx);
+
+
+		} catch (IOException e) {
+			log.error("IOExceptions ",e);
+		} catch (CertificateException e) {
+			log.error("CertificateException ",e);
+		} catch (UnrecoverableKeyException e) {
+			log.error("UnrecoverableKeyException ",e);
+		} catch (NoSuchAlgorithmException e) {
+			log.error("NoSuchAlgorithmException ",e);
+		} catch (KeyStoreException e) {
+			log.error("KeyStoreException ",e);
+		} catch (KeyManagementException e) {
+			log.error("KeyManagementException ",e);
+		}
+
+		return sslCtx.getSocketFactory();
+	}
+
+	private static class KeyManagerBasedOnAlias implements X509KeyManager{
+		private X509KeyManager x509KeyManager;
+		private String alias;
+
+		public KeyManagerBasedOnAlias(X509KeyManager keyManager, String alias){
+			this.x509KeyManager = keyManager;
+			this.alias = alias;
+			log.info("KeyManagerBasedOnAlias  {} ",alias);
+		}
+
+		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket){
+			boolean aliasFound = Boolean.FALSE;
+
+			for (int i = 0; i &lt; keyType.length &amp;&amp; !aliasFound ; i++) {
+
+				String[] validAliases = x509KeyManager.getClientAliases(keyType[i],issuers);
+				if(validAliases != null){
+					for (int j = 0; j &lt; validAliases.length ; j++) {
+						if(validAliases[j].equals(alias)){
+							aliasFound = Boolean.TRUE;
+						}
+					}
+				}
+
+			}
+			log.info("Inside chooseClientAlias for alias : {} found identity : {} ",alias,aliasFound);
+			if(aliasFound){
+				return alias;
+			}else{
+				return  null;
+			}
+		}
+
+		@Override
+		public String[] getClientAliases(String s, Principal[] principals) {
+			return x509KeyManager.getClientAliases(s,principals);
+		}
+
+		@Override
+		public String[] getServerAliases(String s, Principal[] principals) {
+			return x509KeyManager.getServerAliases(s,principals);
+		}
+
+		@Override
+		public String chooseServerAlias(String s, Principal[] principals, Socket socket) {
+			return x509KeyManager.chooseServerAlias(s,principals,socket);
+		}
+
+		@Override
+		public X509Certificate[] getCertificateChain(String s) {
+			return x509KeyManager.getCertificateChain(s);
+		}
+
+		@Override
+		public PrivateKey getPrivateKey(String s) {
+			return x509KeyManager.getPrivateKey(s);
+		}
+
+
+	}
+
+
+
+
+</template><template autoinsert="true" context="java" deleted="false" description="Create ssl context that trust all incoming call" enabled="true" name="trustall">${x: import (
+'javax.net.ssl.*',
+org.slf4j.Logger,
+org.slf4j.LoggerFactory,
+java.io.IOException,
+java.security.SecureRandom,
+java.security.cert.CertificateException,
+java.security.cert.X509Certificate,
+java.util.Properties)}
+
+
+	
+	
+	private static final Logger log = LoggerFactory.getLogger(${enclosing_type}.class);
+
+
+	private static Properties properties = new Properties();
+
+	static{
+		try{
+			log.info("before the ssl properties loading");
+			properties.load(${enclosing_type}.class.getClassLoader().getResourceAsStream("${enclosing_type}_ssl_configuration.properties"));
+			log.info("loaded the properties");
+		}catch (IOException e)
+		{
+			log.error("IOException ...... ",e);
+		}
+	}
+
+	public static SSLSocketFactory createTrustALLSSLSocket() throws Exception{
+		TrustManager[] trustAllManager = new TrustManager[] {new X509TrustManager() {
+			@Override
+			public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+			}
+
+			@Override
+			public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+			}
+
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[0];
+			}
+		}};
+		SSLContext sslContext = SSLContext.getInstance(properties.getProperty("server.ssl.protocol","TLSv1.1"));
+		sslContext.init(null,trustAllManager,new SecureRandom());
+		return  sslContext.getSocketFactory();
+	}
+
+	public static HostnameVerifier allowAllHost(){
+		return new HostnameVerifier() {
+			@Override
+			public boolean verify(String s, SSLSession sslSession) {
+				return true;
+			}
+		};
+	}
+
+
+
+</template><template autoinsert="true" context="java" deleted="false" description="adding spring dependency for a java project" enabled="true" name="gspringaopd">/*
+    // https://mvnrepository.com/artifact/org.springframework/spring-aop
+    compile group: 'org.springframework', name: 'spring-aop', version: '4.3.14.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    compile group: 'org.springframework', name: 'spring-context', version: '4.3.14.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-context-support
+    compile group: 'org.springframework', name: 'spring-context-support', version: '4.3.14.RELEASE'
+
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-expression
+    compile group: 'org.springframework', name: 'spring-expression', version: '4.3.14.RELEASE'
+
+    //aspectjrt
+    compile "org.aspectj:aspectjrt:1.+"
+
+    //slf4j
+    compile "org.slf4j:slf4j-api:1.+"
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+
+    compileOnly "org.projectlombok:lombok:1.+"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+*/</template></templates>
