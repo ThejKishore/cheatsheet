@@ -19,7 +19,7 @@
 | delsvc          | this creates a DELETE Rest service                                                                   |
 | restaudit       | create 3 methods that would be helpful for tracking the incoming request and outgoing ResponseEntity |
 | restadvice      | adds the RestControllerAdvice for handling the error scenario                                        |
-| GetMapping      | adds the main method with the spring boot initialization                                             |
+| main            | adds the main method with the spring boot initialization                                             |
 | cmdlr           | adds the commandLineRunner bean                                                                      |
 | logger          | adds the slf4j logger in the classType                                                               |
 | logd            | adds the log debug statements                                                                        |
