@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<books>
+	<book category="JAVA">
+		<title>Master Core Java</title>
+		<author>James Gosling</author>
+		<year>2015</year>
+		<price>50</price>
+	</book>
+
+	<book category="DOTNET">
+		<title>Get Certified in .Net</title>
+		<author>Bill Gates</author>
+		<year>2016</year>
+		<price>60</price>
+	</book>
+
+	<book category="XML">
+		<title lang="en">XML and XML Schema Definition in easy steps</title>
+		<author>Bharath Thippireddy</author>
+		<year>2014</year>
+		<price>20</price>
+	</book>
+
+	<book category="XML">
+		<title lang="en">XSLT XPATH and XQuery Fundamentals</title>
+		<author>Bharath Thippireddy</author>
+		<year>2016</year>
+		<price>30</price>
+	</book>
+</books>
