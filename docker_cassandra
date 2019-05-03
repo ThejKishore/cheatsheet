@@ -1,0 +1,31 @@
+docker run --name some-cassandra -d cassandra 
+
+docker exec -it bash
+#> cd bin
+#>cqlsh
+
+#cqlsh>CREATE KEYSPACE tutorialspoint WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 3};
+#cqlsh>DESCRIBE keyspaces;
+#cqlsh>USE tutorialspoint;
+#cqlsh:tutorialspoint>CREATE TABLE emp(
+   emp_id int PRIMARY KEY,
+   emp_name text,
+   emp_city text,
+   emp_sal varint,
+   emp_phone varint
+   );
+#cqlsh:tutorialspoint> select * from emp;
+
+
+#cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(1,'ram', 'Hyderabad', 9848022338, 50000);
+
+#cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(2,'robin', 'Hyderabad', 9848022339, 40000);
+
+#cqlsh:tutorialspoint> INSERT INTO emp (emp_id, emp_name, emp_city,emp_phone, emp_sal) VALUES(3,'rahman', 'Chennai', 9848022330, 45000);
+
+
+loading from a file:
+----------------------
+https://docs.datastax.com/en/archived/cql/3.1/cql/cql_reference/source_r.html
+SOURCE '~/mydir/myfile.txt'
+https://docs.datastax.com/en/archived/cql/3.1/cql/cql_reference/cqlsh.html
