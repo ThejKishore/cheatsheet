@@ -105,7 +105,7 @@ buildscript{
     }
 }
 
-task createLocalDockerfile(type: Dockerfile) { 
+task createDockerfile(type: Dockerfile) { 
     destFile = project.file("build/docker/") 
     from "openjdk8:alphine" maintainer "Thej kishore 'kishores1984@gmail.com'" 
     copyFile "libs/${jar.baseName}-${jar.version}.jar", "${jar.baseName}-${jar.version}.jar" 
