@@ -91,35 +91,103 @@ repositories{
 ### bmuschko Docker plugin 
 
 ```groovy
+plugins {
+    id 'org.springframework.boot' version '2.1.5.RELEASE'
+    id 'java'
+    id 'com.bmuschko.docker-remote-api' version '3.5.0'
+}
 
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage 
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
-buildscript{
-    repositories{
-        mavenLocal()
-        mavenCentral()
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.kish.learning'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
     }
-    dependecies{
-        classpath "com.bmuschko:gradle-docker-plugin:4.8.1"
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }
 
-task createDockerfile(type: Dockerfile) { 
-    destFile = project.file("build/docker/") 
-    from "openjdk8:alphine" maintainer "Thej kishore 'kishores1984@gmail.com'" 
-    copyFile "libs/${jar.baseName}-${jar.version}.jar", "${jar.baseName}-${jar.version}.jar" 
-    copyFile "resources/*" , "resources/" 
-    user 'jcpsvcon' 
-    entryPoint '/java.sh', '-jar', "${jar.baseName}-${jar.version}.jar", "--spring.application.name=authentication-service-v1" ,"--spring.config.additional-location=file:application.yml" 
+repositories {
+    mavenCentral()
+    jcenter()
 }
 
-task buildDockerImage(type: DockerBuildImage) { 
-    dependsOn assemble, createDockerfile 
-    inputDir = createDockerfile.destFile.parentFile 
-    pull = false
-    tag = "something:latest" 
+ext {
+    set('springCloudVersion', "Greenwich.SR1")
 }
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+/*
+docker {
+    registryCredentials {
+        username = getConfigurationProperty('DOCKER_USERNAME', 'docker.username')
+        password = getConfigurationProperty('DOCKER_PASSWORD', 'docker.password')
+        email = getConfigurationProperty('DOCKER_EMAIL', 'docker.email')
+    }
+}
+
+String getConfigurationProperty(String envVar, String sysProp) {
+    System.getenv(envVar) ?: project.findProperty(sysProp)
+}
+*/
+
+/**
+ * needed in mac to work
+ */
+task dockerCopy(type: Copy){
+    into "${buildDir}/docker/libs"
+    from "${buildDir}/libs"
+}
+
+task createDockerfile(type: Dockerfile) {
+    def path = project.buildDir
+    println "$path"
+    destFile = project.file('build/docker/Dockerfile')
+    from 'openjdk:8-jre-alpine'
+    maintainer 'Thej Kishore "kishores1984@gmail.com"'
+    workingDir("/app")
+    copyFile "libs/${jar.baseName}-${jar.version}.jar" , "/app/${jar.baseName}-${jar.version}.jar"
+    entryPoint "java"
+    defaultCommand "-jar", "/app/${jar.baseName}-${jar.version}.jar"
+    exposePort 8080
+    runCommand 'apk --update --no-cache add curl'
+    instruction 'HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1'
+}
+
+task buildImage(type: DockerBuildImage) {
+    dependsOn createDockerfile
+    inputDir = createDockerfile.destFile.parentFile
+    tag = "thej/discoverclientdemo:$jar.version"
+}
+
+createDockerfile.dependsOn assemble,dockerCopy
+
+
 ```
 
 ### download plugin 
