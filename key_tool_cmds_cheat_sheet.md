@@ -34,3 +34,9 @@ keytool -printcert -alias ${aliasname} -v -file ${filename} -storepass ${passwor
 ```jshelllanguage
 keytool -import -trustcacerts -noprompt -alias ${aliasname} -file ${filename} -keystore ${filename} -storepass ${password}
 ```
+ 
+#### changing from jks to pkcs12
+The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using 
+```
+keytool -importkeystore -srckeystore ssl-server.jks -destkeystore ssl-server.jks -deststoretype pkcs12
+```
