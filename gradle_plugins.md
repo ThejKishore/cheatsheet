@@ -47,8 +47,9 @@ task rename(type: Copy){
 ```
 
 
-### writinga custom jar
+### writing a custom jar
 
+```groovy
 task customJar(type: Jar){
     into("META-INF/something"){
         include('**/*.sjon')
@@ -56,7 +57,7 @@ task customJar(type: Jar){
     }
     classifier = "stubs"
 }
-
+```
 
 ### maven plugin
 
