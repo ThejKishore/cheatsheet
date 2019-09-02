@@ -1,0 +1,73 @@
+=== Curl Commands
+
+There are a vast amount of use-cases for cURL such as:
+
+FTP upload,
+Proxy support,
+SSL connections,
+HTTP post, etc…
+This tool also supports the use of all the following protocols: DICT, FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTMP, RTSP, SCP, SFTP, SMB, SMBS, SMTP, SMTPS, TELNET and TFTP.
+
+This guide will outline a few popular cURL examples, along with a description of what each command does.
+
+
+==== 1. HTTP GET
+
+[source,bash]
+----
+curl https://www.keycdn.com
+
+curl 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+
+# timeout for HTTP request in UNIX
+
+curl -m 3 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+----
+
+
+==== 2. HTTP POST
+
+[source,bash]
+----
+curl -d 'lat=35&lon=139' http://api.openweathermap.org/data/2.5/weather
+
+curl -d lat=35 -d lon=139 http://api.openweathermap.org/data/2.5/weather
+
+curl -d @requestData.txt http://api.openweathermap.org/data/2.5/weather
+
+----
+
+==== 3. HTTP Authentication
+
+[source,bash]
+----
+curl -u username:password -d status='curl is great' http://twitter.com/statuses/update.xml
+
+----
+
+
+==== 4. HTTP Header
+[source,bash]
+----
+curl -H "Accept: application/json" 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+----
+
+
+==== 5. HTTP Cookie
+[source,bash]
+----
+curl -b "oraclelicense=a" 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+----
+
+==== 6. HTTP download
+[source,bash]
+----
+curl -O 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+----
+
+==== 7. HTTP view response header
+[source,bash]
+----
+curl -i 'http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139'
+----
+
