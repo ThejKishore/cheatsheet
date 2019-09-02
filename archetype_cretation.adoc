@@ -1,0 +1,135 @@
+=== Guide for creating archetypes
+
+==== Prerequisites
+. A maven project in a runnable/deployable state.
+. List of features that archetype will provide out-of-the-box.
+. Motivation
+
+===== Creating and Installing the archetype
+
+Below is a step-by-step guide to create archetype out of a runnable project:
+
+. In your project's root directory , run below command to generate the archetype
++
+[source,bash]
+----
+mvn clean archetype:create-from-project
+----
+. The archetype will be generated under *target/generated-sources/archetype* directory. The structure of this directory will be
++
+[source,bash]
+----
+ - pom.xml
+ - src/
+ - target/
+----
+. Go to *target/generated-sources/archetype* directory and execute `mvn clean` to get rid of the target folder.
+. Go to *target/generated-sources/archetype/src/main/resource/archetype-resources* directory.
+. Analyze , modify , delete the files as required.
+. Delete `build` , `target` , `bin` and any such folders/files that should not be packaged with archetype.
+. Substitute appropriate placeholders for gradle `groupId` , `artifactId`  and whereever required.
+. Replace `/target/generated-sources/archetype/src/main/resources/META-INF/maven/archetype-metadata.xml` with archetype-xml.
+. Replace `/target/generated-sources/archetype/src/main/resources/projects/basic/archetype.properties` with archetype.properties
+. run `mvn install` within directory `target/generated-sources/archetype`. This will install archetype to your local maven repository.
+
+==== Testing the Archetype
+
+For testing the installed archetype , generated project using the archetype and verify.
+
+. The project structure of resulting project is correct.
+. No unwanted files or folders are present.
+. The Project is in compilable state without any errors and can be deployable to locally.
+
+==== Publishing the Archetype
+
+Execute `mvn deploy` in `target/generated-sources/archetype` directory to publish the archetype to nexus repo.
+
+=== Understanding archetype-metadata.xml
+
+A descriptor file holding metadata regarding how the archetype should be generated , what files and folders will be packed etc.
+It also allows you to define additional required properties apart from groupID and artifactId.
+
+
+.filtered fileset
+[source,xml]
+----
+<fileSet filtered="true" encoding="utf-8">
+    <directory>src/main/resources</directory>
+    <includes>
+        <include>**/*.yml</include>
+        <include>**/*.properties</include>
+    </includes>
+</fileSet>
+----
+
+The above config tels that `yml and properties` under `resources` should be scanned and the placeholders in them should be replaced.
+
+.pacakaged fileset
+[source,xml]
+----
+<fileSet filtered="true" encoding="utf-8">
+    <directory>src/test/java</directory>
+    <includes>
+        <include>**/*.java</include>
+    </includes>
+</fileSet>
+----
+
+.additional required properties
+[source,xml]
+----
+<requiredProperties>
+    <requiredProperty key="port">
+        <defaultValue>${something.properties:9090}</defaultValue>
+    </requiredPropertyr>
+</requiredProperties>
+----
+
+
+.archetype-metadata.xml
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="SampleMVC"
+    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <requiredProperties>
+        <requiredProperty key="groupId">
+            <defaultValue>com.luckyryan</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="artifactId"/>
+        <requiredProperty key="version">
+            <defaultValue>1.0-SNAPSHOT</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="package">
+            <defaultValue>com.luckyryan.sample</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+  <fileSets>
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>src/main/webapp</directory>
+      <includes>
+        <include>**/*.jsp</include>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>src/main/resources</directory>
+      <includes>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+</archetype-descriptor>
+----
+
+==== Refernces
+
+. https://luckyryan.com/2013/02/15/create-maven-archetype-from-existing-project[archetype creation reference]
+. http://maven.apache.org/archetype/maven-archetype-plugin/specification/archetype-metadata.html[maven_site]
