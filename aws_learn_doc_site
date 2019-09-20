@@ -1,0 +1,42 @@
+AWS_Classes:
+--------------
+
+https://proven-class.s3-us-west-2.amazonaws.com/TechEss.htm
+
+Account Sign up:
+	 https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
+
+https://aws.amazon.com/blogs/aws/new-vpc-traffic-mirroring/
+
+Security Groups:
+	 https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html 
+
+
+NACLS: 
+	https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html
+
+Amazon Machine Image. More details here:
+
+	https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html
+
+VPN: 
+	https://aws.amazon.com/vpn/
+
+Direct Connect: 
+	https://aws.amazon.com/directconnect/
+
+EBS: 
+	https://aws.amazon.com/ebs/
+
+Elastic Compute Cloud (EC2): 
+	https://aws.amazon.com/ec2/getting-started/
+
+
+
+Amazon Inspector : 
+	https://aws.amazon.com/inspector/
+
+example: simple storage service (S3) cross region replication:
+	 https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html
+
+https://aws.amazon.com/solutions/?solutions-all.sort-by=item.additionalFields.sortDate&solutions-all.sort-order=desc
