@@ -1,0 +1,86 @@
+====  About the Cassandra consistency level
+The Cassandra consistency level is defined as the minimum number of Cassandra nodes that must acknowledge a read or write operation before the operation can be considered successful. Different consistency levels can be assigned to different Edge keyspaces.
+
+When connecting to Cassandra for read and write operations, Message Processor and Management Server nodes typically use the Cassandra value of LOCAL_QUORUM to specify the consistency level for a keyspace. However, some keyspaces are defined to use a consistency level of one.
+
+The calculation of the value of LOCAL_QUORUM for a data center is:
+
+[source,bash]
+----
+LOCAL_QUORUM = (replication_factor/2) + 1
+----
+
+As described above, the default replication factor for an Edge production environment with three Cassandra nodes is three. Therefore, the default value of LOCAL_QUORUM = (3/2) +1 = 2 (the value is rounded down to an integer).
+
+With LOCAL_QUORUM = 2, at least two of the three Cassandra nodes in the data center must respond to a read/write operation for the operation to succeed. For a three node Cassandra cluster, the cluster could therefore tolerate one node being down per data center.
+
+By specifying the consistency level as LOCAL_QUORUM, Edge avoids the latency required by validating operations across multiple data centers. If a keyspace used the Cassandra QUORUM value as the consistency level, read/write operations would have to be validated across all data centers.
+
+==== local cassandra start
+
+[source,bash]
+----
+brew services start cassandra
+
+/bin/cqlsh -u user -h localhost -p ${cred}
+----
+
+=== docker compose for cassandra cluster.
+
+[source,yaml]
+----
+version: '3.3'
+
+networks:
+  default:
+    external:
+      name: localnetwork
+
+# 3 node cluster
+# If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
+services:
+  cassandra-seed:
+    container_name: cassandra-seed-node
+    image: cassandra:3.11.0
+    ports:
+      - "9042:9042"   # Native transport
+      - "7199:7199"   # JMX
+      - "9160:9160"   # Thrift clients
+
+  cassandra-node-1:
+    image: cassandra:3.11.0
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 30 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - "CASSANDRA_SEEDS=cassandra-seed-node"
+    depends_on:
+      - "cassandra-seed"
+
+  # you cannot have multiple nodes join the cluster at the same time when
+  # cassandra.consistent.rangemovement is true so we further delay it to give it time to stabilize
+  cassandra-node-2:
+    image: cassandra:3.11.0
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 80 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      - "CASSANDRA_SEEDS=cassandra-seed-node"
+    depends_on:
+      - "cassandra-seed"
+
+  portainer:
+    image: portainer/portainer
+#    networks:
+#        - localnetwork
+    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./portainer-data:/data
+    # Enable you to access potainers web interface from your host machine
+    # using http://localhost:10001
+    ports:
+        - "10001:9000"
+
+----
+
+==== reference
+
+https://github.com/calvinlfer/compose-cassandra-cluster/blob/master/docker-compose.yml
+
+http://abiasforaction.net/apache-cassandra-cluster-docker/
