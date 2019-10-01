@@ -1,0 +1,371 @@
+
+
+=== finding images in local
+
+[source,bash]
+----
+docker images
+----
+
+=== searching images in net
+
+[source,bash]
+----
+docker search ubuntu
+----
+
+==== images with 1000 star...
+
+[source,bash]
+----
+docker search ubuntu -s 1000
+
+Flag --stars has been deprecated, use --filter=stars=3 instead
+NAME                DESCRIPTION                                     STARS               OFFICIAL            AUTOMATED
+ubuntu              Ubuntu is a Debian-based Linux operating sys…   9395                [OK]
+
+----
+
+
+=== list all the running containers in system
+
+[source,bash]
+----
+docker ps
+----
+
+
+=== list all the latest containers in local
+
+[source,bash]
+----
+docker ps -a
+
+----
+
+
+=== running docker
+
+[source,bash]
+----
+docker run -it {container_name} {command_to_run}
+or
+docker run -i -t ubuntu ./bin/bash
+----
+
+=== running as demon
+
+[source,bash]
+----
+docker run -d --name={conatiner_name} {container_name}
+----
+
+
+=== create a new docker image from the container. (provide docker id)
+
+[source,bash]
+----
+docker commit  -a "{conatiner_id}" {old_container_id min of 3 or 4 digits}  {image-name:tag}
+
+----
+
+adding volume to mount from local to the image `localpath:container_path`  `container_running_port:exposed_port_to_outside`
+
+[source,bash]
+----
+docker run -it -v  /usr/thej:/host -p 9000:3000 {image_name:tag}  {command_to_run}
+
+
+docker commit -a "node_microservice" {old_container_id} {image_name:tag}
+
+-w working directory
+docker run -d -w {/microservice} -p 9000:3000 {image_name:id} {command (npm start)}
+----
+
+
+=== getting docker ip address...
+
+[source,bash]
+----
+docker inspect | grep '"IPAddress":"' |
+----
+
+=== attaching to a running docker
+
+[source,bash]
+----
+docker attach {container_id_ 3 or 4 chrs }
+
+----
+
+=== pushing the image to docker hub
+
+need to have an account
+
+docker login
+
+ui:
+
+pwd:
+
+
+[source,bash]
+----
+docker push {tag_name}
+----
+
+=== docker tag
+
+[source,bash]
+----
+docker tag {image_name:tag} {image_name:latest}
+----
+
+=== docker-machine
+
+[source,bash]
+----
+docker-machine ls
+
+NAME      ACTIVE   DRIVER       STATE     URL   SWARM   DOCKER    ERRORS
+default   -        virtualbox   Stopped                 Unknown
+myHost    -        virtualbox   Stopped                 Unknown
+----
+
+[source,bash]
+----
+docker-machine create -help | grep digitalocean
+docker-machine create -help | grep google
+
+eval "$(docker-machine env digitalocean)"
+
+docker load -i hello.tar
+
+----
+
+
+
+docker file ( should be name Dockerfile)
+
+[source,bash]
+----
+FROM ubuntu:latest
+MAINTAINER thej
+
+RUN apt-get update
+RUN apt-get install --yes nodejs nodejs-legacy npm
+RUN apt-get clean
+
+COPY ./package.json src/
+
+RUN cd src && npm install
+
+# optimizing the copy
+
+COPY . /src
+
+WORKDIR src/
+
+CMD ["npm" ,"start"]
+----
+
+
+=== Docker build
+
+[source,bash]
+----
+ docker build -t {tag_name} .
+----
+
+
+==== Dockerfile springboot2 eaxmple
+
+[source,bash]
+----
+FROM java:8-jre-alpine
+
+EXPOSE 8080
+
+RUN mkdir /app
+COPY target/*.jar /app/spring-boot-application.jar
+
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
+----
+
+==== Here is the multi-stage build definition
+
+[source,bash]
+----
+FROM maven:3.5.2-jdk-8-alpine AS MAVEN_TOOL_CHAIN
+COPY pom.xml /tmp/
+RUN mvn -B dependency:go-offline -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml
+COPY src /tmp/src/
+WORKDIR /tmp/
+RUN mvn -B -s /usr/share/maven/ref/settings-docker.xml verify
+
+FROM java:8-jre-alpine
+
+EXPOSE 8080
+
+RUN mkdir /app
+COPY --from=MAVEN_TOOL_CHAIN /tmp/target/*.jar /app/spring-boot-application.jar
+
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
+----
+
+This docker build does the following:
+
+Starts from the standard Maven Docker image
+
+Copies only the pom.xml file inside the container
+
+Runs a mvn command to download all dependencies found in the pom.xml
+
+Copies the rest of the source code in the container
+
+Compiles the code, runs unit tests and then integration tests (with mvn verify)
+
+Discards the Maven image with all the compiled classes/unit test results etc.
+
+Starts again from the JRE image and copies only the JAR file created before
+
+
+=== ubuntu commands for installing required software.
+
+[source,bash]
+----
+sh for installing node and npm in ubuntu
+
+apt-get update
+apt-get install --yes nodejs
+apt-get install --yes nodejs-legacy
+apt-get install --yes npm
+
+cp -r /host /microservice
+----
+
+blog.codefresh.io
+
+==== docker network
+
+[source,bash]
+----
+docker network create -d bridge localnetwork
+
+docker network ls
+
+docker network rm ${network_name}
+----
+
+==== docker clean up
+
+[source,bash]
+----
+
+docker rm $(docker ps -a -q)
+
+docker images | grep "<none>"
+
+docker rmi $(docker images | grep "<none>")
+----
+
+==== running docker process
+
+[source,bash]
+----
+docker ps -a
+----
+
+==== available images locally
+
+[source,bash]
+----
+
+docker images ls (or) docker images
+----
+
+==== Inspect command
+
+[source,bash]
+----
+docker inspect ${containerid} | grep '"IPAddress":"1' | head -n 1
+----
+
+==== docker compose cmds
+
+[source,bash]
+----
+
+docker-compose -f stack.yml up -d --force-recreate --build
+
+docker-compose -f stack.yml up -d
+
+docker-compose -f stack.yml stop
+
+docker-compose -f stack.yml logs ${service_name}
+
+docker-compose -f stack.yml pause ${service_name}
+
+docker-compose -f stack.yml unpause ${service_name}
+
+docker-compose -f stack.yml stop ${service_name}
+
+docker-compose -f stack.yml restart ${service_name}
+----
+
+==== docker-compose sample
+
+[source,yaml]
+----
+version: '3.3'
+
+networks:
+  default:
+    external:
+      name: localnetwork
+
+# 3 node cluster
+# If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
+services:
+  cassandra-seed:
+    container_name: cassandra-seed-node
+    image: cassandra:3.11.0
+    ports:
+      - "9042:9042"   # Native transport
+      - "7199:7199"   # JMX
+      - "9160:9160"   # Thrift clients
+    environment:
+      - "JAVA_OPTS=-Xms1g -Xmx1g "
+    command: |
+      --spring.profiles.active=local
+    healthcheck:
+      test: ["CMD-SHELL","nc -i 1 -v 127.0.0.1 9002 2>&1 | grep -i connectes"]
+      interval: 60s
+      timeout: 2s
+      retries: 10
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart-policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 60s
+      resources:
+        limits:
+          memory: "1g"
+        reservation:
+          memore: "1g"
+      placement:
+        constraints:
+          - engine.labels.hosttype== something
+
+----
+
+==== reference
+
+https://docker-k8s-lab.readthedocs.io/en/latest/docker/docker-compose.html
+
+https://docs.docker.com/compose/compose-file/
+
+
