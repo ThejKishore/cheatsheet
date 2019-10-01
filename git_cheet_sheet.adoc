@@ -1,0 +1,135 @@
+==== GIT Cheat Sheet
+
+===== Git Config
+
+[source,bash]
+----
+
+git config --list
+
+git config --global http.sslVerify false
+
+git config --global user.email kishores1984@gmail.com
+
+git config --global user.name "thejkishore"
+
+## unsetting the credentials
+
+git config --local --unset credential.helper
+
+git config --global --unset credential.helper
+
+----
+
+===== git merge one branch into another
+
+[source,bash]
+----
+git checkout develop
+
+git pull --rebase
+
+git checkout feature/something
+
+git merge develop
+
+## if no conflict
+
+git commit -m "commit message"
+
+git push
+
+----
+
+==== git stash
+
+[source,bash]
+----
+
+git stash
+
+git stash list
+
+git stash save ""
+
+git stash apply ""
+----
+
+==== git branch
+
+[source,bash]
+----
+# git change branch
+
+git checkout branch_name
+
+# create new branch
+
+git checkout -b branch_name
+
+# git delete branch
+# always delete the remote branch and then local
+
+# deleting remote
+git push origin --delete branch_name
+
+# deleting local
+
+git branch -d branch_name
+
+----
+
+==== discard all current changes
+
+[source,bash]
+----
+
+git reset --hard HEAD
+
+----
+
+==== undoing committed changes
+
+[source,bash]
+
+----
+git revert commit_id
+
+or
+
+git reset --hard commit_id
+----
+
+==== git tagging
+
+===== git tag creation
+[source,bash]
+----
+
+git tag -a tag_id -m "commit message"
+
+git push origin tag_id
+
+----
+
+===== git tag deletion
+always delete remote and then local
+[source,bash]
+----
+git push --delete origin tag_id
+
+
+git tag -d tag_id
+
+----
+
+==== git removing untagged file
+
+[source,bash]
+----
+git clean -n
+
+git clean -dn
+
+git clean -dfi
+----
