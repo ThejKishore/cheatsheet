@@ -30,6 +30,9 @@ EBS:
 
 Elastic Compute Cloud (EC2): 
 	https://aws.amazon.com/ec2/getting-started/
+	
+EMR Cluster Cli Help	
+https://docs.aws.amazon.com/cli/latest/reference/emr/create-cluster.html
 
 
 
