@@ -1,0 +1,180 @@
+=== Quarkus
+ 
+=== Learning Quarkus..
+
+==== Gradle  quarkus quide.
+https://quarkus.io/guides/gradle-tooling#import-in-your-ide
+
+==== Cheat Sheet:
+
+==== 1  run the app in dev mode
+[source,bash]
+----
+./gradlew quarkusDev
+
+----
+
+==== 2 build a uber jar to test.
+
+[source,bash]
+----
+./gradlew quarkusBuild --uber-jar
+----
+
+==== 3  build a native docker image
+
+[source,bash]
+----
+./gradlew buildNative --docker-build=true
+----
+
+==== 4 quarkus adding extensions
+[source,bash]
+----
+./gradlew addExtension --extensions="hibernate*"
+----
+
+
+==== 5 listing the quarkus extensions
+
+
+[source,bash]
+----
+./gradlew listExtensions
+
+
+Agroal - Database connection pool (io.quarkus:quarkus-agroal:${quarkus.version})
+Amazon DynamoDB (io.quarkus:quarkus-amazon-dynamodb:${quarkus.version})
+Apache Kafka Client (io.quarkus:quarkus-kafka-client:${quarkus.version})
+Apache Kafka Streams (io.quarkus:quarkus-kafka-streams:${quarkus.version})
+Apache Tika (io.quarkus:quarkus-tika:${quarkus.version})
+Arc (io.quarkus:quarkus-arc:${quarkus.version})
+AWS Lambda (io.quarkus:quarkus-amazon-lambda:${quarkus.version})
+Camel Core (io.quarkus:quarkus-camel-core:${quarkus.version})
+Camel Infinispan (io.quarkus:quarkus-camel-infinispan:${quarkus.version})
+Camel Netty4 HTTP (io.quarkus:quarkus-camel-netty4-http:${quarkus.version})
+Camel Salesforce (io.quarkus:quarkus-camel-salesforce:${quarkus.version})
+Flyway (io.quarkus:quarkus-flyway:${quarkus.version})
+Hibernate ORM (io.quarkus:quarkus-hibernate-orm:${quarkus.version})
+Hibernate ORM with Panache (io.quarkus:quarkus-hibernate-orm-panache:${quarkus.version})
+Hibernate Search + Elasticsearch (io.quarkus:quarkus-hibernate-search-elasticsearch:${quarkus.version})
+Hibernate Validator (io.quarkus:quarkus-hibernate-validator:${quarkus.version})
+Infinispan Client (io.quarkus:quarkus-infinispan-client:${quarkus.version})
+JDBC Driver - H2 (io.quarkus:quarkus-jdbc-h2:${quarkus.version})
+JDBC Driver - MariaDB (io.quarkus:quarkus-jdbc-mariadb:${quarkus.version})
+JDBC Driver - PostgreSQL (io.quarkus:quarkus-jdbc-postgresql:${quarkus.version})
+JSON-B (io.quarkus:quarkus-jsonb:${quarkus.version})
+JSON-P (io.quarkus:quarkus-jsonp:${quarkus.version})
+Keycloak (io.quarkus:quarkus-keycloak:${quarkus.version})
+Kogito (io.quarkus:quarkus-kogito:${quarkus.version})
+Kotlin (io.quarkus:quarkus-kotlin:${quarkus.version})
+Kubernetes (io.quarkus:quarkus-kubernetes:${quarkus.version})
+Kubernetes Client (io.quarkus:quarkus-kubernetes-client:${quarkus.version})
+Mailer (io.quarkus:quarkus-mailer:${quarkus.version})
+MongoDB Client (io.quarkus:quarkus-mongodb-client:${quarkus.version})
+Narayana JTA - Transaction manager (io.quarkus:quarkus-narayana-jta:${quarkus.version})
+Neo4j client (io.quarkus:quarkus-neo4j:${quarkus.version})
+Reactive PostgreSQL Client (io.quarkus:quarkus-reactive-pg-client:${quarkus.version})
+RESTEasy (io.quarkus:quarkus-resteasy:${quarkus.version})
+RESTEasy - JSON-B (io.quarkus:quarkus-resteasy-jsonb:${quarkus.version})
+Scheduler (io.quarkus:quarkus-scheduler:${quarkus.version})
+Security (io.quarkus:quarkus-elytron-security:${quarkus.version})
+SmallRye Context Propagation (io.quarkus:quarkus-smallrye-context-propagation:${quarkus.version})
+SmallRye Fault Tolerance (io.quarkus:quarkus-smallrye-fault-tolerance:${quarkus.version})
+SmallRye Health (io.quarkus:quarkus-smallrye-health:${quarkus.version})
+SmallRye JWT (io.quarkus:quarkus-smallrye-jwt:${quarkus.version})
+SmallRye Metrics (io.quarkus:quarkus-smallrye-metrics:${quarkus.version})
+SmallRye OpenAPI (io.quarkus:quarkus-smallrye-openapi:${quarkus.version})
+SmallRye OpenTracing (io.quarkus:quarkus-smallrye-opentracing:${quarkus.version})
+SmallRye Reactive Streams Operators (io.quarkus:quarkus-smallrye-reactive-streams-operators:${quarkus.version})
+SmallRye Reactive Type Converters (io.quarkus:quarkus-smallrye-reactive-type-converters:${quarkus.version})
+SmallRye Reactive Messaging (io.quarkus:quarkus-smallrye-reactive-messaging:${quarkus.version})
+SmallRye Reactive Messaging - Kafka Connector (io.quarkus:quarkus-smallrye-reactive-messaging-kafka:${quarkus.version})
+SmallRye Reactive Messaging - AMQP Connector (io.quarkus:quarkus-smallrye-reactive-messaging-amqp:${quarkus.version})
+SmallRye REST Client (io.quarkus:quarkus-smallrye-rest-client:${quarkus.version})
+Spring DI compatibility layer (io.quarkus:quarkus-spring-di:${quarkus.version})
+Swagger UI (io.quarkus:quarkus-swagger-ui:${quarkus.version})
+Undertow (io.quarkus:quarkus-undertow:${quarkus.version})
+Undertow WebSockets (io.quarkus:quarkus-undertow-websockets:${quarkus.version})
+Eclipse Vert.x (io.quarkus:quarkus-vertx:${quarkus.version})
+
+
+
+
+
+----
+
+
+===== 6 gradle settings
+[source,groovy]
+----
+ext{
+    quarkusVersion="1.0.0.CR1"
+    quarkusPlatformArtifactId="quarkus-universe-bom"
+    quarkusPlatformVersion="1.0.0.CR1"
+    quarkusPlatformGroupId="io.quarkus"
+}
+
+// this block is necessary to make enforcedPlatform work for Quarkus plugin available
+// only locally (snapshot) that is also importing the Quarkus BOM
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        classpath "io.quarkus:quarkus-gradle-plugin:${quarkusVersion}"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+apply plugin: 'io.quarkus'
+
+repositories {
+     mavenLocal()
+     mavenCentral()
+}
+
+dependencies {
+    implementation 'io.quarkus:quarkus-smallrye-metrics'
+    implementation 'io.quarkus:quarkus-spring-data-jpa'
+    implementation 'io.quarkus:quarkus-spring-di'
+    implementation 'io.quarkus:quarkus-spring-web'
+    implementation 'io.quarkus:quarkus-jdbc-h2'
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-resteasy'
+
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+
+    nativeTestImplementation 'io.quarkus:quarkus-junit5'
+    nativeTestImplementation 'io.rest-assured:rest-assured'
+}
+
+group 'com.kish.learning.quarkus'
+version '1.0.0-SNAPSHOT'
+
+compileJava {
+    options.compilerArgs << '-parameters'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+----
+
+
+
+
+
+===== Reference
+https://quarkus.io/guides/gradle-tooling#project-creation[quarkus_gradle]
+
+https://quarkus.io/guides/gradle-tooling[quarkus_gradle_tooling]
+
+https://quarkus.io/guides/application-configuration-guide[quarkus_config]
+
+https://lordofthejars.github.io/quarkus-cheat-sheet/#quarkuscheatsheet[single_page_quarkus_cheat_sheet]
