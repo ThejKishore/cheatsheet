@@ -1,0 +1,92 @@
+ Resource contractFile = resourceLoader.getResource(args[0])
+
+        log.info (" contract File Resource ${contractFile.exists()}")
+
+        File file = new File(contractFile.URI)
+
+        if(file.exists() && !file.isDirectory()) {
+            log.info  (" --->  ${new File(contractFile.URI).getText()}")
+        } else if( file.exists() && file.isDirectory() ) {
+            log.info  (" the give path is a directory")
+        }
+
+        GradleConnector connector = GradleConnector.newConnector()
+
+        log.info (" connector ")
+
+        String currentProjectDirectory = getUsersProjectRootDirectory()
+        log.info  (" currentProjectDirectory ${currentProjectDirectory}")
+        connector.forProjectDirectory(new File("${currentProjectDirectory}"))
+
+        File tmpFolder = File.createTempDir()
+
+        log.info  (" tmpFolder ${tmpFolder.path}")
+
+        ContractVerifierConfigProperties properties = new ContractVerifierConfigProperties()
+        File originalSourceRootDirectory = new File(contractFile.URI)
+
+        File sourceDir = new File(tmpFolder.path + "source")
+        File targetDir = new File(tmpFolder.path + "target")
+
+        if(!sourceDir.exists() || !sourceDir.isDirectory()) { sourceDir.mkdirs()}
+        if(!targetDir.exists() || !targetDir.isDirectory()) { targetDir.mkdirs()}
+
+        properties.contractsDslDir = sourceDir
+        properties.stubsOutputDir = targetDir
+        properties.excludedFiles = ["dir2/**"]
+        FileSystemUtils
+                .copyRecursively(originalSourceRootDirectory, properties.contractsDslDir)
+
+        RecursiveFilesConverter recursiveFilesConverter = new RecursiveFilesConverter(properties)
+
+        recursiveFilesConverter.processFiles()
+        Collection<File> createdFiles = [] as List
+        properties.stubsOutputDir.
+                eachFileRecurse(FileType.FILES) { createdFiles << it }
+        createdFiles.forEach{log.info ( "${it.name} \n=========\n ${it.getText()}")}
+
+        String packageName = args[1]
+        String artifcatId = args[2]
+        String version = args[3]
+
+        String serviceName = ""
+        if(args.length > 4) {
+            serviceName = args[4]
+        }
+
+        File stubDirectory = new File(currentProjectDirectory+"/build/stubs/META-INF/${packageName}/${artifcatId}/${version}/")
+        File mappingDirectory = null
+        File contractDirectory = null
+        if(serviceName!=null && !serviceName.isEmpty()) {
+            mappingDirectory = new File(currentProjectDirectory + "/build/stubs/META-INF/${packageName}/${artifcatId}/${version}/mappings/${serviceName}/")
+            contractDirectory = new File(currentProjectDirectory + "/build/stubs/META-INF/${packageName}/${artifcatId}/${version}/contracts/${serviceName}/")
+        } else{
+            mappingDirectory = new File(currentProjectDirectory + "/build/stubs/META-INF/${packageName}/${artifcatId}/${version}/mappings/")
+            contractDirectory = new File(currentProjectDirectory + "/build/stubs/META-INF/${packageName}/${artifcatId}/${version}/contracts/")
+        }
+        if(!stubDirectory.exists() || !stubDirectory.isDirectory()) { stubDirectory.mkdirs()}
+        if(!mappingDirectory.exists() || !mappingDirectory.isDirectory()) { mappingDirectory.mkdirs()}
+        if(!contractDirectory.exists() || !contractDirectory.isDirectory()) { contractDirectory.mkdirs()}
+
+        //Copying the json files
+        FileSystemUtils
+                .copyRecursively(targetDir, mappingDirectory)
+
+        //Copying the contract file
+        FileSystemUtils
+                .copyRecursively(originalSourceRootDirectory, contractDirectory)
+
+
+        tmpFolder.deleteDir()
+    }
+
+
+    static String getUsersProjectRootDirectory() {
+        String envRootDir = System.getProperty("user.dir");
+        Path rootDir = Paths.get(".").normalize().toAbsolutePath();
+        if ( rootDir.startsWith(envRootDir) ) {
+            return rootDir
+        } else {
+            throw new RuntimeException("Root dir not found in user directory.");
+        }
+    }
