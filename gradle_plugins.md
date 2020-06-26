@@ -7,6 +7,17 @@ rootProject.children.each { subproject ->
     subproject.buildFileName = "${subproject.name}.gradle"
 
 }
+
+or
+
+fileTree('.'){
+    include( '**/build.gradle' )
+    exclude('build.gradle')
+}.collect {
+    relativePath(it.parent).replace(File.separator,':')
+}.each {
+    include(it)
+}
 ```
 
 
