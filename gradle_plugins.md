@@ -1,7 +1,13 @@
 ## Gradle
 
 
+### Settings.gradle
+```groovy
+rootProject.children.each { subproject ->
+    subproject.buildFileName = "${subproject.name}.gradle"
 
+}
+```
 
 
 ### if a task depends on other task
