@@ -1,0 +1,192 @@
+==== Scripts 
+
+===== OAuth Pre-script OAUTH token
+
+https://www.pluralsight.com/guides/set-up-postman-and-automatically-add-bearer-tokens[pre-request Oauth script]
+
+[source,javascript]
+----
+let tokenUrl;
+let clientId;
+let clientSecret;
+
+if (pm.environment.name === 'development') {
+  const tokenUrl = 'https://development-authority.com/connect/token';
+  const clientId = 'xxxxxx';
+  const clientSecret = 'xxxxxx';
+else if (pm.environment.name === 'staging') {
+  const tokenUrl = 'https://staging-authority.com/connect/token';
+  const clientId = 'yyyyyy';
+  const clientSecret = 'yyyyyy';
+}
+
+
+const getTokenRequest = {
+  method: 'POST',
+  url: tokenUrl,
+  body: {
+      mode: 'formdata',
+      formdata: [
+          { key: 'grant_type', value: 'client_credentials' },
+          { key: 'client_id', value: clientId },
+          { key: 'client_secret', value: clientSecret },
+          { key: 'scope', value: 'open profile' }
+      ]
+  }
+};
+
+pm.sendRequest(getTokenRequest, (err, response) => {
+  const jsonResponse = response.json();
+  const newAccessToken = jsonResponse.access_token;
+
+  pm.variables.set('access_token', newAccessToken);
+});
+
+----
+
+
+https://learning.postman.com/docs/writing-scripts/script-references/test-examples/[postman-test-api-ref]
+
+
+==== OAuth Post test
+
+==== Status Code
+
+[source,javascript]
+----
+//response code test
+pm.test("Status code is 200", () => {
+  pm.expect(pm.response.code).to.eql(200);
+});
+----
+
+==== Multiple Assertions
+[source,javascript]
+----
+
+//Using multiple assertions
+
+pm.test("The response has all properties", () => {
+    //parse the response json and test three properties
+    const responseJson = pm.response.json();
+    pm.expect(responseJson.type).to.eql('vip');
+    pm.expect(responseJson.name).to.be.a('string');
+    pm.expect(responseJson.id).to.have.lengthOf(1);
+});
+
+
+----
+
+==== Headers Assertions
+
+[source,javascript]
+----
+//testing headers
+pm.test("Content-Type header is present", () => {
+  pm.response.to.have.header("Content-Type");
+});
+
+
+----
+
+==== Cookies Assertions
+
+[source,javascript]
+----
+//testing cookies
+pm.test("Cookie JSESSIONID is present", () => {
+  pm.expect(pm.cookies.has('JSESSIONID')).to.be.true;
+});
+
+----
+
+==== Response time Assertions
+
+[source,javascript]
+----
+
+//testing response time
+
+pm.test("Response time is less than 200ms", () => {
+  pm.expect(pm.response.responseTime).to.be.below(200);
+});
+
+----
+
+==== Multiple Assertions for a json
+
+
+[source,javascript]
+----
+
+// asserting json
+
+/* response has this structure:
+{
+  "name": "Jane",
+  "age": 29,
+  "hobbies": [
+    "skating",
+    "painting"
+  ],
+  "email": null
+}
+*/
+const jsonData = pm.response.json();
+pm.test("Test data type of the response", () => {
+  pm.expect(jsonData).to.be.an("object");
+  pm.expect(jsonData.name).to.be.a("string");
+  pm.expect(jsonData.age).to.be.a("number");
+  pm.expect(jsonData.hobbies).to.be.an("array");
+  pm.expect(jsonData.website).to.be.undefined;
+  pm.expect(jsonData.email).to.be.null;
+});
+
+----
+
+==== Multiple Assertions for array json
+
+
+[source,javascript]
+----
+
+// asserting array json
+
+/*
+response has this structure:
+{
+  "errors": [],
+  "areas": [ "goods", "services" ],
+  "settings": [
+    {
+      "type": "notification",
+      "detail": [ "email", "sms" ]
+    },
+    {
+      "type": "visual",
+      "detail": [ "light", "large" ]
+    }
+  ]
+}
+*/
+
+const jsonData = pm.response.json();
+pm.test("Test array properties", () => {
+    //errors array is empty
+  pm.expect(jsonData.errors).to.be.empty;
+    //areas includes "goods"
+  pm.expect(jsonData.areas).to.include("goods");
+    //get the notification settings object
+  const notificationSettings = jsonData.settings.find
+      (m => m.type === "notification");
+  pm.expect(notificationSettings)
+    .to.be.an("object", "Could not find the setting");
+    //detail array should include "sms"
+  pm.expect(notificationSettings.detail).to.include("sms");
+    //detail array should include all listed
+  pm.expect(notificationSettings.detail)
+    .to.have.members(["email", "sms"]);
+});
+
+
+----
