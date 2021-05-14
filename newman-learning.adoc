@@ -17,6 +17,9 @@ newman run my-collection.json --global-var "machineName=mymachine1234" --global-
 ==== ref
 
 https://www.npmjs.com/package/newman-reporter-junitfull[junit-reporter]
+
 https://www.npmjs.com/package/newman-reporter-htmlextra[html-reporter]
+
 https://postman-quick-reference-guide.readthedocs.io/en/latest/newman.html[quick-reference]
+
 
