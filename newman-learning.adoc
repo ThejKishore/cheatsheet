@@ -1,0 +1,22 @@
+=== Install newman
+[source,bash]
+----
+npm install -g newman newman-reporter-htmlextra newman-reporter-junitfull
+
+newman run -h 
+
+newman run {{collections.json}} -e {{env.json}} -r junit,htmlextra --reporter-junit-export './examples/original/result.xml' -n 2
+
+newman run collection.json -r htmlextra --reporter-htmlextra-export ./results/report.html
+
+newman run collection.json --delay 10000
+
+newman run my-collection.json --global-var "machineName=mymachine1234" --global-var "machinePort=8080"
+----
+
+==== ref
+
+https://www.npmjs.com/package/newman-reporter-junitfull[junit-reporter]
+https://www.npmjs.com/package/newman-reporter-htmlextra[html-reporter]
+https://postman-quick-reference-guide.readthedocs.io/en/latest/newman.html[quick-reference]
+
