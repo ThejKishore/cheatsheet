@@ -1,11 +1,11 @@
 import os
 import shutil
 
-
-replacement = """test"""
+print("project name :")
+projectName = input()
 
 # copy files recursivley
-dest="/Users/thej/test-project/"+replacement
+dest="/Users/thej/test-project/"+projectName
 
 # Copy the content of
 # source to destination
@@ -19,10 +19,10 @@ for dname, dirs, files in os.walk(dest):
         fpath = os.path.join(dname, fname)
         with open(fpath) as f:
             s = f.read()
-        s = s.replace("${project}", replacement)
+        s = s.replace("${project}", projectName)
 
         os.remove(fpath)
-        fname = fname.replace("${project}", replacement)
+        fname = fname.replace("${project}", projectName)
         fpath = os.path.join(dname, fname)
 
         with open(fpath, "w") as f:
