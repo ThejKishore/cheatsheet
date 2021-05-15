@@ -1,8 +1,8 @@
 import os
 import shutil
 
-print("project name :")
-projectName = input()
+
+projectName = input("project name :")
 
 # copy files recursivley
 dest="/Users/thej/test-project/"+projectName
