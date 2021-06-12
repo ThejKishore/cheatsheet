@@ -32,5 +32,7 @@ https://github.com/nareshnavinash/newman-run[newman-run]
 https://github.com/ervirendersingh/newman-reporter-allure[alure-reporting]
 
 
+https://k6.io/docs/getting-started/running-k6/[k6-load-testing]
+
 
 
