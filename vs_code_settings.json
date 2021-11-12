@@ -1,0 +1,26 @@
+{
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.tabCompletion": "on",
+    "editor.wordWrap": "on",
+    "files.trimFinalNewlines": true,
+    "files.autoSave": "afterDelay",
+    "prettier.singleQuote": true,
+    "prettier.semi": true,
+    "prettier.jsxBracketSameLine": true,
+    "prettier.tabWidth": 2,
+    "prettier.useTabs": true,
+    "prettier.jsxSingleQuote": true,
+    "diffEditor.ignoreTrimWhitespace": true,
+    "editor.codeActionsOnSave": { "source.fixAll.eslint": true , "source.organizeImports": true},
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+
+}
