@@ -94,7 +94,7 @@ kubernetes {
 						  }]
 			}
 			env {
-				KEY_VAULT_URL = "https://thej-eastus-learn.vault.azure.net"
+				KEY_VAULT_URL = "https://test-learn.vault.azure.net"
 			}
 			labels {
 				labelWithValue = "foo"
