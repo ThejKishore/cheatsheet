@@ -1,231 +1,174 @@
 plugins {
-    id "java"
-    id "maven-publish"
-    id "idea"
-    id "eclipse"
-    id "jacoco"
-    id "org.springframework.boot"
-    id "com.google.cloud.tools.jib"
-    id "com.gorylenko.gradle-git-properties"
-    id "org.sonarqube"
-    id "com.diffplug.spotless"
-    id "io.spring.nohttp"
-    id "com.github.andygoossens.gradle-modernizer-plugin"
-    id "org.liquibase.gradle"
-    // jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
+	alias(libs.plugins.ktJvm)
+	alias(libs.plugins.ktSpring)
+	alias(libs.plugins.spring)
+	alias(libs.plugins.springManagement)
+//	alias(libs.plugins.dockerPlugin)
+	alias(libs.plugins.jkubePlugin)
 }
 
-group = "com.learn.jpa"
+
+
+//apply from: "gradle/docker.gradle"
+
+
+group = "com.tk.learn"
 version = "0.0.1-SNAPSHOT"
 
-description = ""
-
-sourceCompatibility=17
-targetCompatibility=17
-assert System.properties["java.specification.version"] == "17" || "18" || "19" || "20" || "21"
-
-ext {
-    springProfiles = ""
-    if (project.hasProperty("tls")) {
-        springProfiles += ",tls"
-    }
-    if (project.hasProperty("e2e")) {
-        springProfiles += ",e2e"
-    }
-}
-
-apply from: "gradle/docker.gradle"
-apply from: "gradle/sonar.gradle"
-
-spotless {
-    java {
-        target 'src/*/java/**/*.java'
-        // removeUnusedImports()
-    }
-}
-
-apply from: "gradle/cache.gradle"
-apply from: "gradle/liquibase.gradle"
-// jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
-
-if (project.hasProperty("prod") || project.hasProperty("gae")) {
-    apply from: "gradle/profile_prod.gradle"
-} else {
-    apply from: "gradle/profile_dev.gradle"
-}
-
-if (project.hasProperty("war")) {
-    apply from: "gradle/war.gradle"
-}
-
-if (project.hasProperty("gae")) {
-    apply plugin: 'maven'
-    apply plugin: 'org.springframework.boot.experimental.thin-launcher'
-    apply plugin: 'io.spring.dependency-management'
-
-    dependencyManagement {
-        imports {
-            mavenBom "tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}"
-        }
-    }
-    appengineStage.dependsOn thinResolve
-}
-
-
-idea {
-    module {
-        excludeDirs += files("node_modules")
-    }
-}
-
-eclipse {
-    sourceSets {
-        main {
-            java {
-                srcDirs += ["build/generated/sources/annotationProcessor/java/main"]
-            }
-        }
-    }
-}
-
-defaultTasks "bootRun"
-
-springBoot {
-    mainClass = "com.learn.jpa.TransactionApp"
-}
-
-test {
-    useJUnitPlatform()
-    exclude "**/*IT*", "**/*IntTest*"
-    testLogging {
-        events 'FAILED', 'SKIPPED'
-    }
-    jvmArgs += '-Djava.security.egd=file:/dev/./urandom -Xmx512m'
-    // uncomment if the tests reports are not generated
-    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
-    // ignoreFailures true
-    reports.html.required = false
-}
-
-modernizer {
-    failOnViolations = true
-    includeTestClasses = true
-}
-
-
-
-check.dependsOn integrationTest
-task testReport(type: TestReport) {
-    destinationDirectory = file("$buildDir/reports/tests")
-    testResults.from(test)
-}
-
-task integrationTestReport(type: TestReport) {
-    destinationDirectory = file("$buildDir/reports/tests")
-    testResults.from(integrationTest)
-}
-
-gitProperties {
-    failOnNoGitDirectory = false
-    keys = ["git.branch", "git.commit.id.abbrev", "git.commit.id.describe"]
-}
-
-tasks.withType(com.gorylenko.GenerateGitPropertiesTask).configureEach {
-  outputs.doNotCacheIf("Task is always executed") { true }
-}
-
-checkstyle {
-    toolVersion "${checkstyleVersion}"
-    configFile file("checkstyle.xml")
-    checkstyleTest.enabled = false
-}
-nohttp {
-    source.include "build.gradle", "README.md"
-}
-
-configurations {
-    providedRuntime
-    implementation.exclude module: "spring-boot-starter-tomcat"
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
 repositories {
-    // Local maven repository is required for libraries built locally with maven like development jhipster-bom.
-    // mavenLocal()
-    mavenCentral()
-    // jhipster-needle-gradle-repositories - JHipster will add additional repositories
+	mavenCentral()
 }
+
+var springCloudAzureVersion = "5.16.0"
 
 dependencies {
-    // import JHipster dependencies BOM
-    if (!project.hasProperty("gae")) {
-        implementation platform("tech.jhipster:jhipster-dependencies:${jhipsterDependenciesVersion}")
-    }
-
-    // Use ", version: jhipsterDependenciesVersion, changing: true" if you want
-    // to use a SNAPSHOT release instead of a stable release
-    implementation "tech.jhipster:jhipster-framework"
-    implementation "jakarta.annotation:jakarta.annotation-api"
-    implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hibernate6"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
-    testImplementation "org.testcontainers:junit-jupiter"
-    testImplementation "org.testcontainers:testcontainers"
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-api"
-    implementation "com.zaxxer:HikariCP"
-    implementation "org.apache.commons:commons-lang3"
-    annotationProcessor "org.hibernate.orm:hibernate-jpamodelgen:${hibernateVersion}"
-    implementation "org.hibernate.orm:hibernate-core"
-    implementation "org.hibernate.validator:hibernate-validator"
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
-    implementation "org.springframework.boot:spring-boot-loader-tools"
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    testImplementation "org.testcontainers:jdbc"
-    implementation "org.springframework.boot:spring-boot-starter-logging"
-    implementation "org.springframework.boot:spring-boot-starter-mail"
-    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.boot:spring-boot-test"
-    testImplementation "org.springframework.security:spring-security-test"
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:${archunitJunit5Version}") {
-        exclude group: "org.slf4j", module: "slf4j-api"
-    }
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:${archunitJunit5Version}") {
-        exclude group: "org.slf4j", module: "slf4j-api"
-    }
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
-    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
-    implementation "org.springframework.security:spring-security-data"
-    implementation "io.micrometer:micrometer-registry-prometheus"
-    implementation "io.dropwizard.metrics:metrics-core"
-    // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
-}
-
-if (project.hasProperty("gae")) {
-    task createPom {
-        def basePath = 'build/resources/main/META-INF/maven'
-        doLast {
-            pom {
-                withXml(dependencyManagement.pomConfigurer)
-            }.writeTo("${basePath}/${project.group}/${project.name}/pom.xml")
-        }
-    }
-    bootJar.dependsOn = [createPom]
-}
-
-task cleanResources(type: Delete) {
-    delete "build/resources"
-}
-
-wrapper {
-    gradleVersion = "8.5"
+	implementation(enforcedPlatform("com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"))
+	implementation(libs.azkeyVault)
+//	implementation(libs.azAppConfig)
+	implementation(libs.ktReflect)
+	testImplementation(libs.bootTest)
+	testImplementation(libs.ktJunit5)
+	testImplementation(libs.junitPlatform)
 }
 
 
-compileJava.dependsOn processResources
-processResources.dependsOn bootBuildInfo
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.add("-Xjsr305=strict")
+	}
+}
+
+
+tasks {
+	test {
+		testLogging.showExceptions = true
+		useJUnitPlatform()
+	}
+}
+
+//docker {
+//	springBootApplication {
+//		baseImage = "eclipse-temurin:21"
+//		images = ["${project.name}:0.0.1" , "${project.name}:latest" ]
+//		jvmArgs = ["-Xmx2048m"]
+//	}
+//}
+
+//apply from: "gradle/k8s.gradle"
+
+task copyDependencies(type: Copy) {
+	from configurations.runtimeClasspath
+	into file("build/dependencies")
+}
+
+
+build.dependsOn(copyDependencies)
+
+k8sBuild.dependsOn(build)
+
+kubernetes {
+	image {
+		name = "${project.name}:${project.version}"
+		alias = "camel-service"
+		build {
+			from = "eclipse-temurin:21-jre"
+			assembly {
+				targetDir = "/app"
+				layers = [{
+							  fileSets = [{
+											  directory = file("${project.rootDir}/build/dependencies")
+											  outputDirectory = "libs"
+										  }, {
+											  directory = file("${project.rootDir}/build/classes")
+											  outputDirectory = "classes"
+										  }, {
+											  directory = file("${project.rootDir}/build/resources/main")
+											  outputDirectory = "resources"
+										  }]
+						  }]
+			}
+			env {
+				KEY_VAULT_URL = "https://thej-eastus-learn.vault.azure.net"
+			}
+			labels {
+				labelWithValue = "foo"
+				version = "${project.version}"
+				artifactId = "${project.name}"
+			}
+			ports = ["8080"]
+			entryPoint {
+				exec = ["java", "-Xmx2048m", "-cp", "/app/resources:/app/classes/java/main:/app/classes/kotlin/main:/app/libs/*", "com.tk.learn.azkeyvault.AzKeyvaultApplicationKt"]
+			}
+		}
+	}
+
+	resources {
+		labels {
+			all {
+				extraLabel = "quickstart-groovy-dsl-configuration"
+			}
+		}
+		controllerName = "${project.name}-controller"
+		replicas = "2"
+		volumes = [
+				{
+					name = "scratch"
+					type = "emptyDir"
+					medium = "Memory"
+					mounts = ["/var/scratch"]
+				},
+				{
+					name = "downward-api-volume"
+					type = "downwardAPI"
+					items = [{
+								 path = "labels"
+								 fieldRef {
+									 fieldPath = "metadata.labels"
+								 }
+							 },
+							 {
+								 path = "annotations"
+								 fieldRef {
+									 fieldPath = "metadata.annotations"
+								 }
+							 }]
+				},
+				{
+					name = "config-vol"
+					type = "configMap"
+					configMapName = "log-config"
+					configMapItems = [{
+										  key = "log_level"
+										  path = "log_level"
+									  }]
+				}
+		]
+
+		services = [{
+						name = "${project.name}-service-one"
+						headless = "false"
+						type = "NodePort"
+						ports = [{
+									 protocol = "tcp"
+									 port = "8787"
+									 targetPort = "8787"
+								 }]
+					}]
+
+
+
+		configMap {
+			name = "log-config"
+			entries = [{
+						   name = "log_level"
+						   value = "INFO"
+					   }]
+		}
+	}
+}
