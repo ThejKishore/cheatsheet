@@ -1,3 +1,11 @@
+# Path to your oh-my-zsh installation.
+export ZSH=/Users/thej/.oh-my-zsh
+
+# Set name of the theme to load. Optionally, if you set this to "random"
+# it'll load a random theme each time that oh-my-zsh is loaded.
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+
+ZSH_THEME="agnoster"
 alias gs="git status"
 alias gb="git branch"
 alias gpl="git pull"
