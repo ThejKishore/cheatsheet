@@ -1,0 +1,73 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.fasterxml.jackson.core:jackson-annotations:2.17.2'
+        classpath 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+        classpath 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
+    }
+}
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+
+// Groovy POJOs to model the YAML structure, with Jackson ignoring Gradle/Groovy metadata
+@JsonIgnoreProperties(["originalClassName", "contentHash", "metaClass"]) 
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+class Values {
+    String tla
+    String applicationName
+    Values.Deployments deployments
+
+    @JsonIgnoreProperties(["originalClassName", "contentHash", "metaClass"]) 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    static class Deployments {
+        String version
+        String namespace
+        String imageName
+        Values.Deployments.Image image
+
+        @JsonIgnoreProperties(["originalClassName", "contentHash", "metaClass"]) 
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        static class Image {
+            String tag
+            String name
+        }
+    }
+}
+
+// Define the task here so that the POJOs and the task live in the same applied script
+tasks.register("generateValuesYaml") {
+    group = "custom"
+    description = "Generates a values.yaml file using Jackson YAML"
+
+    doLast {
+        // Build POJO data using local Groovy classes annotated to ignore metadata
+        def data = new Values(
+                tla: "wal",
+                applicationName: "Wealth Application",
+                deployments: new Values.Deployments(
+                        version: "1.0.0",
+                        namespace: "wealth",
+                        imageName: "gchr.io/wealth",
+                        image: new Values.Deployments.Image(
+                                name: "",
+                                tag: ""
+                        )
+                )
+        )
+
+        def objectMapper = new com.fasterxml.jackson.databind.ObjectMapper(
+                new com.fasterxml.jackson.dataformat.yaml.YAMLFactory()
+        )
+
+        def outputFile = file("${project.buildDir}/values.yaml")
+        outputFile.parentFile.mkdirs()
+        objectMapper.writeValue(outputFile, data)
+
+        println "Generated values.yaml at: ${outputFile.absolutePath}"
+
+    }
+}
