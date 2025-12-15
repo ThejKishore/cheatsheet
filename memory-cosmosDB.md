@@ -15,24 +15,27 @@ Foundry IQ helps address the challenge of providing AI agents with relevant and 
 
 
 
-Traditional RAG vs. Agentic Memory
-Traditional RAG (Retrieval-Augmented Generation):
+## Traditional RAG vs. Agentic Memory
+
+### Traditional RAG (Retrieval-Augmented Generation):
 
 Retrieves documents or chunks based on semantic similarity
 Static knowledge base that doesn't learn from interactions
 Same results for all users querying similar topics
 No concept of "importance" or "recency" - just similarity scores
-Agentic Memory:
+### Agentic Memory:
 
 Stores personalized facts learned from conversations
 Dynamic knowledge that grows with each interaction
 User-specific preferences and history
 Salience scoring based on importance, confidence, and recency
 Cross-session persistence that creates continuity
-Three Types of Memory
+
+
+## Three Types of Memory
 Our memory system implements three distinct types inspired by cognitive psychology:
 
-1. Declarative Memory (Semantic Facts)
+### 1. Declarative Memory (Semantic Facts)
 Long-term, stable facts about the user that rarely change.
 
 Examples:
@@ -47,7 +50,7 @@ High confidence scores (0.9-1.0)
 Long TTL (never expire)
 Rarely updated once established
 Critical for filtering search results
-2. Procedural Memory (Behavioral Patterns)
+### 2. Procedural Memory (Behavioral Patterns)
 Patterns in user behavior and preferences learned over time.
 
 Examples:
@@ -62,7 +65,7 @@ Confidence scores that increase with repeated observations
 Medium TTL (90-180 days)
 Updated with each confirming interaction
 Used to personalize recommendations
-3. Episodic Memory (Trip-Specific Context)
+### 3. Episodic Memory (Trip-Specific Context)
 Specific events and experiences from past trips.
 
 Examples:
@@ -77,22 +80,25 @@ Tied to specific trips and dates
 Short to medium TTL (30-90 days)
 Prevents duplicate recommendations
 Provides context for follow-up trips
-When to Store vs. When to Recall
-Store Memories When:
+### When to Store vs. When to Recall
+
+#### Store Memories When:
 
 ✅ User explicitly states a preference or restriction
 ✅ User makes a choice (selects a hotel, books a restaurant)
 ✅ User provides feedback (positive or negative)
 ✅ Clear behavioral pattern emerges (3+ similar choices)
 ✅ User shares context about travel companions or needs
-Recall Memories When:
+
+#### Recall Memories When:
 
 ✅ Starting a search operation (filter by restrictions)
 ✅ Making recommendations (boost matching preferences)
 ✅ User returns after time gap (restore context)
 ✅ Generating itineraries (incorporate past learnings)
 ✅ User asks "what did I..." questions
-Don't Store:
+
+#### Don't Store:
 
 ❌ Ambiguous statements without clear intent
 ❌ Contradictory information (resolve conflict first)
