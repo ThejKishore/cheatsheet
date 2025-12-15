@@ -1,3 +1,20 @@
+# Work IQ:
+
+•	Work IQ is described as the intelligence layer that enables Copilot and agents to understand you, your job, and your company. It understands your business workflows and relationships. It connects everything that matters inside your company, transforming it into an experience that feels effortless, powerful, and personal
+
+# Fabric IQ
+•	Fabric IQ is a workload for unifying data sitting across OneLake (including lakehouses, eventhouses, and semantic models) and organizing it according to the language of your business. The data is then exposed to analytics, AI agents, and applications with consistent semantic meaning and context.
+
+
+
+# Foundry IQ
+
+
+•	Foundry IQ intelligent knowledge layer within the Microsoft Foundry platform, designed to provide secure, enterprise-scale context for AI agents by connecting them to diverse data sources like SharePoint, Fabric, and the web, simplifying Retrieval-Augmented Generation (RAG) with smart retrieval and orchestration, and ensuring data governance for building more capable and trustworthy AI applications.
+Foundry IQ helps address the challenge of providing AI agents with relevant and secure information from various business sources to ensure they can function effectively and intelligently.
+
+
+
 Traditional RAG vs. Agentic Memory
 Traditional RAG (Retrieval-Augmented Generation):
 
