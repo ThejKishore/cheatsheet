@@ -739,25 +739,88 @@ External Users
 
 # 32. RISK ASSESSMENT
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| IAM outage | High | HA federation and failover |
-| Kafka lag | Medium | Monitoring and autoscaling |
-| DB bottleneck | High | Index tuning and scaling |
-| Secret leakage | Critical | Conjur rotation and audit |
+| Risk ID | Risk | Impact | Likelihood | Mitigation | Owner |
+|---|---|---|---|---|---|
+| R-001 | PingFederate outage blocks authentication | High | Medium | HA federation nodes, health checks, failover runbook | IAM Lead |
+| R-002 | Okta/Ping Identity provisioning drift | Medium | Medium | Automated provisioning, periodic access review | IAM Lead |
+| R-003 | PCF Go Router saturation | High | Medium | Scale routers, request rate limits, capacity alerts | Platform Ops |
+| R-004 | Gateway policy misconfiguration | High | Medium | Policy-as-code, pre-prod validation, canary rollout | App Platform |
+| R-005 | Eureka registry inconsistency | Medium | Low | HA cluster, eviction tuning, health checks | App Platform |
+| R-006 | Config drift in Config Server | Medium | Medium | GitOps approval workflow, config validation tests | DevOps Lead |
+| R-007 | Conjur secret exposure | Critical | Low | Least-privilege policies, rotation, audit alerts | Security |
+| R-008 | Oracle DB performance bottleneck | High | Medium | Index tuning, connection pooling, workload tests | DBA |
+| R-009 | Kafka lag or partition imbalance | Medium | Medium | Monitoring, autoscaling consumers, rebalancing | Messaging Lead |
+| R-010 | Solace queue backlog | Medium | Medium | Capacity thresholds, retry/backoff policies | Messaging Lead |
+| R-011 | WAF rule gaps at Akamai | High | Medium | OWASP rules, periodic tuning, pen testing | Security |
+| R-012 | Non-compliant log retention | High | Medium | Centralized logging policy, retention automation | Ops |
+| R-013 | Uncontrolled cost growth | Medium | Medium | Budget alerts, capacity caps, quarterly reviews | Finance/IT |
+| R-014 | Incident response delays | High | Medium | On-call training, runbooks, drills | Ops |
+| R-015 | Data loss during DR event | High | Low | Backups, replication, DR tests | DBA |
 
 # 33. COMPLIANCE AND REGULATORY
 
-- ISO 27001 Annex A controls
-- NIST CSF alignment
-- Data privacy laws
+The platform aligns to ISO 27001 Annex A and NIST CSF controls. The mappings below describe how controls are implemented across PCF, identity, network, and data layers.
+
+## 33.1 ISO 27001 Annex A Mapping
+
+| ISO 27001 Control | Control Objective | Implementation in This Solution |
+|---|---|---|
+| A.5.7 Threat intelligence | Awareness of threats | Akamai WAF alerts, SOC feeds, SIEM integration |
+| A.5.15 Access control | Least privilege | Okta/Ping RBAC, Conjur policies |
+| A.5.17 Authentication | Strong authentication | MFA via Okta, SSO via PingFederate |
+| A.5.23 Cloud services | Secure cloud use | PCF platform hardening, isolation zones |
+| A.5.24 Incident response | Response readiness | Runbooks, on-call rotation, drills |
+| A.8.2 Privileged access | Controlled admin access | PIM/approval workflows, audit logs |
+| A.8.9 Configuration mgmt | Secure config | Git-backed Config Server, change approvals |
+| A.8.10 Information deletion | Secure disposal | Data retention and disposal policy |
+| A.8.12 Data leakage prevention | Protect sensitive data | Conjur secrets, encryption, DLP rules |
+| A.8.16 Monitoring activities | Detect anomalies | Centralized logging, alerts, SIEM |
+| A.8.20 Network security | Segmentation | DMZ/App/Data zones, firewall rules |
+| A.8.23 Web filtering | Protect web channels | Akamai WAF, rate limiting |
+| A.8.24 Cryptography | Protect data | TLS 1.2+, encrypted storage |
+| A.8.28 Secure coding | Reduce app risk | SAST/DAST, code reviews |
+| A.8.31 Separation | Reduce impact | Environment isolation, PCF org/space |
+| A.8.32 Change mgmt | Controlled changes | CAB, change records |
+| A.8.33 Backup | Resilient recovery | Oracle backups, config repo backups |
+
+## 33.2 NIST CSF Mapping
+
+| NIST CSF Function | Category | Implementation in This Solution |
+|---|---|---|
+| Identify | Asset Management | CMDB, inventory of PCF apps/services |
+| Identify | Risk Assessment | Risk register, quarterly reviews |
+| Identify | Governance | SDAM controls, CAB, policy enforcement |
+| Protect | Access Control | Okta/Ping RBAC, MFA, Conjur |
+| Protect | Awareness & Training | Secure coding and ops training |
+| Protect | Data Security | Encryption at rest/in transit, backups |
+| Protect | Protective Tech | WAF, IDS/IPS, network segmentation |
+| Detect | Anomalies & Events | SIEM alerts, Akamai anomaly detection |
+| Detect | Monitoring | App/infra logging, metrics, traces |
+| Respond | Response Planning | IR plan, on-call, runbooks |
+| Respond | Mitigation | Playbooks, automated rollback |
+| Recover | Recovery Planning | DR site, RTO/RPO targets |
+| Recover | Improvements | Post-incident reviews, RCA |
 
 # 34. SECURITY CONTROLS
 
-- RBAC enforcement
-- mTLS and TLS 1.2+
-- WAF and DDoS protection
-- Centralized logging and auditing
+## 34.1 Control Summary
+- RBAC enforced at gateway and service level
+- mTLS where required, TLS 1.2+ end-to-end
+- WAF and DDoS protection via Akamai
+- Centralized logging with SIEM integration
+- Secrets management via Conjur
+- Configuration managed via Git-backed Config Server
+
+## 34.2 Control-to-Component Mapping
+
+| Control | Component | Evidence |
+|---|---|---|
+| AuthN/AuthZ | PingFederate, Okta | SSO logs, MFA reports |
+| API Security | Spring Cloud Gateway | Policy config, audit logs |
+| Secrets | Conjur | Rotation logs, access logs |
+| Config Integrity | Config Server | Git audit history |
+| Network Segmentation | DMZ/App/Data zones | Firewall rules, network diagrams |
+| Monitoring | Boot Admin, SIEM | Alert history, dashboards |
 
 # 35. AUDIT AND ASSURANCE
 
@@ -822,13 +885,13 @@ User → Akamai → PingFederate → PCF Router → Gateway → Microservice →
 
 # Appendix C – Glossary
 
-PCF – Pivotal Cloud Foundry
-IAM – Identity and Access Management
-HA – High Availability
-DR – Disaster Recovery
-RBAC – Role-Based Access Control
-RTO – Recovery Time Objective
-RPO – Recovery Point Objective
-SLA – Service Level Agreement
-SAST – Static Application Security Testing
-DAST – Dynamic Application Security Testing
+- PCF – Pivotal Cloud Foundry
+- IAM – Identity and Access Management
+- HA – High Availability
+- DR – Disaster Recovery
+- RBAC – Role-Based Access Control
+- RTO – Recovery Time Objective
+- RPO – Recovery Point Objective
+- SLA – Service Level Agreement
+- SAST – Static Application Security Testing
+- DAST – Dynamic Application Security Testing
