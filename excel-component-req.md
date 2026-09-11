@@ -489,37 +489,36 @@ or in a Qute template:
 ```
 
 
-```asciidoc
+# TailwindCSS
 
-= Quarkus image:logo.svg[width=25em] Web Bundler - Integrations
+We added a Web Bundler + [TailwindCSS
+4+](https://tailwindcss.com/docs/styling-with-utility-classes){window="_blank"}
+extension which makes it very easy to use Tailwind with Quarkus (and
+[Roq](https://iamroq.com/){window="_blank"}).
 
-include::./_includes/attributes.adoc[]
+Tailwind CSS lets you rapidly build modern websites by applying utility
+classes directly in your HTML or through your CSS.
 
-[#tailwindcss]
-== TailwindCSS
+## Installation {#_installation}
 
-We added a Web Bundler + https://tailwindcss.com/docs/styling-with-utility-classes[TailwindCSS 4+, window="_blank"] extension which makes it very easy to use Tailwind with Quarkus (and https://iamroq.com/[Roq, window="_blank"]).
-
-Tailwind CSS lets you rapidly build modern websites by applying utility classes directly in your HTML or through your CSS.
-
-=== Installation
-
-If you want to use this extension, you need to add the `io.quarkiverse.web-bundler:quarkus-web-bundler-tailwindcss` extension first to your build file.
+If you want to use this extension, you need to add the
+`io.quarkiverse.web-bundler:quarkus-web-bundler-tailwindcss` extension
+first to your build file.
 
 For instance, with Maven, add the following dependency to your POM file:
 
-[source,xml,subs=attributes+]
-----
+``` {.xml subs="attributes+"}
 <dependency>
     <groupId>io.quarkiverse.web-bundler</groupId>
     <artifactId>quarkus-web-bundler-tailwindcss</artifactId>
     <version>{project-version}</version>
 </dependency>
-----
+```
 
-With Gradle, you need to add this plugin (to allow architecture based resolution) and the dependency:
-[source,kotlin,subs=attributes+]
-----
+With Gradle, you need to add this plugin (to allow architecture based
+resolution) and the dependency:
+
+``` {.kotlin subs="attributes+"}
 plugins {
   id("io.mvnpm.gradle.plugin.native-java-plugin") version "1.0.0"
 }
@@ -529,26 +528,36 @@ plugins {
 dependencies {
     implementation("io.quarkiverse.web-bundler:quarkus-web-bundler-tailwindcss:{project-version}")
 }
-----
+```
 
-=== Usage
+## Usage {#_usage}
 
-There is no need to add the TailwindCSS mvnpm dependency in your project.
+There is no need to add the TailwindCSS mvnpm dependency in your
+project.
 
 Then in your web directory:
-[source,css]
-.web/style.css
-----
+
+:::: {}
+::: title
+web/style.css
+:::
+
+``` css
 @import "tailwindcss";
-----
+```
+::::
 
-*Start using Tailwind in your HTML*:
+**Start using Tailwind in your HTML**:
 
-For example with Qute Web, start using Tailwind’s utility classes to style your content:
+For example with Qute Web, start using Tailwind's utility classes to
+style your content:
 
-[source,css]
-.src/main/resources/templates/pub/index.html
-----
+:::: {}
+::: title
+src/main/resources/templates/pub/index.html
+:::
+
+``` css
 <!doctype html>
 <html>
 <head>
@@ -562,87 +571,124 @@ Hello world!
 </h1>
 </body>
 </html>
-----
+```
+::::
 
-=== Configuration
+## Configuration {#_configuration}
 
-TailwindCSS is pre-configured to scan all Qute templates in your project and jars (and in Roq files) looking for class candidates in order to optimize your output css.
+TailwindCSS is pre-configured to scan all Qute templates in your project
+and jars (and in Roq files) looking for class candidates in order to
+optimize your output css.
 
-It is possible to manually configure the pattern for scanning via the Quarkus configuration:
-include::_includes/quarkus-web-bundler-tailwindcss.adoc[leveloffset=+1, opts=optional]
+It is possible to manually configure the pattern for scanning via the
+Quarkus configuration:
 
-WARNING: The `@source` path is resolved from the bundling directory (`target`), not relative to your source file, which can make referencing source files tricky. If the default setup and pattern do not meet your needs, https://github.com/quarkiverse/quarkus-web-bundler/issues/366[vote up this issue].
+:::: warning
+::: title
+Warning
+:::
 
-=== Splitting Styles
+The `@source` path is resolved from the bundling directory (`target`),
+not relative to your source file, which can make referencing source
+files tricky. If the default setup and pattern do not meet your needs,
+[vote up this
+issue](https://github.com/quarkiverse/quarkus-web-bundler/issues/366).
+::::
 
-You can split your Tailwind CSS by importing files from your main stylesheet:
+## Splitting Styles {#_splitting_styles}
 
-[source,css]
-.web/style.css
-----
+You can split your Tailwind CSS by importing files from your main
+stylesheet:
+
+:::: {}
+::: title
+web/style.css
+:::
+
+``` css
 @import "tailwindcss";
 @import "./_theme.css";
-----
+```
+::::
 
-Prefix imported files with `_` so they aren’t treated as root bundles, and don’t include `@import "tailwindcss";` again:
+Prefix imported files with `_` so they aren't treated as root bundles,
+and don't include `@import` `"tailwindcss";` again:
 
-[source,css]
-.web/_theme.css
-----
+:::: {}
+::: title
+web/\_theme.css
+:::
+
+``` css
 @theme {
   --color-mint-500: oklch(0.72 0.11 178);
 }
-----
+```
+::::
 
-=== Tailwind Plugins
+## Tailwind Plugins {#_tailwind_plugins}
 
-It is possible to use Tailwind plugins (DaisyUI, Flowbite, ...). Add the mvnpm dependency in your project (as provided) and then use the `@plugin` in your Tailwind css file.
+It is possible to use Tailwind plugins (DaisyUI, Flowbite, ...). Add the
+mvnpm dependency in your project (as provided) and then use the
+`@plugin` in your Tailwind css file.
 
-==== Tailwind Typography plugin (styling rich text content)
+### Tailwind Typography plugin (styling rich text content) {#_tailwind_typography_plugin_(styling_rich_text_content)}
 
-The https://github.com/tailwindlabs/tailwindcss-typography[Tailwind Typography, window="_blank"] plugin *is pre-installed* because it’s essential for styling rich text content, allowing you to use it without adding extra dependencies.:
+The [Tailwind
+Typography](https://github.com/tailwindlabs/tailwindcss-typography){window="_blank"}
+plugin **is pre-installed** because it's essential for styling rich text
+content, allowing you to use it without adding extra dependencies.:
 
-.web/style.css
-[source,css]
-----
+:::: {}
+::: title
+web/style.css
+:::
+
+``` css
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-----
+```
+::::
 
 Then in your html templates:
-[source,html]
-----
+
+``` html
 <article class="prose">
   <h1>Hello World</h1>
   <p>This text is styled using Tailwind Typography.</p>
 </article>
-----
+```
 
-[#svelte]
-== Svelte
+# Svelte
 
-We added a Web Bundler + https://svelte.dev/[Svelte, window="_blank"] extension which makes it very easy to use Svelte with Quarkus.
+We added a Web Bundler + [Svelte](https://svelte.dev/){window="_blank"}
+extension which makes it very easy to use Svelte with Quarkus.
 
-Svelte is a UI framework that uses a compiler to let you write breathtakingly concise javascript components that do minimal work in the browser, using languages you already know — HTML, CSS and JavaScript. It may be used to create Javascript components for Qute for example.
+Svelte is a UI framework that uses a compiler to let you write
+breathtakingly concise javascript components that do minimal work in the
+browser, using languages you already know --- HTML, CSS and JavaScript.
+It may be used to create Javascript components for Qute for example.
 
-=== Installation
+## Installation {#_installation_2}
 
-If you want to use this extension, you need to add the `io.quarkiverse.web-bundler:quarkus-web-bundler-svelte` extension first to your build file.
+If you want to use this extension, you need to add the
+`io.quarkiverse.web-bundler:quarkus-web-bundler-svelte` extension first
+to your build file.
 
 For instance, with Maven, add the following dependency to your POM file:
 
-[source,xml,subs=attributes+]
-----
+``` {.xml subs="attributes+"}
 <dependency>
     <groupId>io.quarkiverse.web-bundler</groupId>
     <artifactId>quarkus-web-bundler-svelte</artifactId>
     <version>{project-version}</version>
 </dependency>
-----
+```
 
-With Gradle, you need to add this plugin (to allow architecture based resolution) and the dependency:
-[source,kotlin,subs=attributes+]
-----
+With Gradle, you need to add this plugin (to allow architecture based
+resolution) and the dependency:
+
+``` {.kotlin subs="attributes+"}
 plugins {
   id("io.mvnpm.gradle.plugin.native-java-plugin") version "1.0.0"
 }
@@ -652,113 +698,160 @@ plugins {
 dependencies {
     implementation("io.quarkiverse.web-bundler:quarkus-web-bundler-svelte:{project-version}")
 }
-----
+```
 
-=== Usage
+## Usage {#_usage_2}
 
-There is no need to add the Svelte mvnpm dependency in your project when using custom elements (configurable).
+There is no need to add the Svelte mvnpm dependency in your project when
+using custom elements (configurable).
 
 In your web directory:
-[source,sveltehtml]
-.web/App.svelte
-----
+
+:::: {}
+::: title
+web/App.svelte
+:::
+
+``` sveltehtml
 <svelte:options customElement="my-component" />
 <script>
-	let count = $state(0);
+    let count = $state(0);
 
-	function increment() {
-		count += 1;
-	}
+    function increment() {
+        count += 1;
+    }
 </script>
 
 <button onclick={increment}>
-	Clicked {count}
-	{count === 1 ? 'time' : 'times'}
+    Clicked {count}
+    {count === 1 ? 'time' : 'times'}
 </button>
-----
+```
+::::
 
-=== Configuration
+## Configuration {#_configuration_2}
 
-include::_includes/quarkus-web-bundler-svelte.adoc[leveloffset=+1, opts=optional]
+# Server-Side Qute Components {#qute-components}
 
-[#qute-components]
-== Server-Side Qute Components
+When you need to include custom scripts or styles in your Qute tags,
+Server-Side Qute Components provides an elegant solution.
 
-When you need to include custom scripts or styles in your Qute tags, Server-Side Qute Components provides an elegant solution.
+:::: important
+::: title
+Important
+:::
 
-IMPORTANT: This requires `quarkus-qute` or `quarkus-qute-web` in the project (and this is not made to be used with the build-time template rendering).
+This requires `quarkus-qute` or `quarkus-qute-web` in the project (and
+this is not made to be used with the build-time template rendering).
+::::
 
-To enable server-side components, add this in the `application.properties`:
-[source,properties]
-----
+To enable server-side components, add this in the
+`application.properties`:
+
+``` properties
 quarkus.web-bundler.bundle.components=true
-quarkus.web-bundler.bundle.components.key=app // <1>
-quarkus.web-bundler.bundle.components.qute-tags=true // <2>
-----
-<1> use `app` to have a single merged bundle with the `app` (or remove this line to use `components` as default)
-<2> activate qute-tags support (default is `false`)
-
-Here is a nice convention to define your components: `src/main/resources/web/components/[name]/[name].{html,css,scss,js,ts,...};`. The scripts, styles and assets will be bundled, the html template will be usable as a {quarkus-guides-url}/qute-reference#user_tags[Qute tag].
-
-Example:
-- `src/main/resources/web/components/hello/hello.html`
-- `src/main/resources/web/components/hello/hello.js`
-- `src/main/resources/web/components/hello/hello.scss`
-
-This way you can use `{#hello}` in your templates and the scripts & styles will be bundled.
-
-NOTE: You may create different qute components groups to be used in different pages.
-
+quarkus.web-bundler.bundle.components.key=app // ①
+quarkus.web-bundler.bundle.components.qute-tags=true // ②
 ```
 
-```asciidoc
+::: callout-list
+1.  use `app` to have a single merged bundle with the `app` (or remove
+    this line to use `components` as default)
 
-= Quarkus image:logo.svg[width=25em] Web Bundler - Examples
+2.  activate qute-tags support (default is `false`)
+    :::
 
-include::./_includes/attributes.adoc[]
+Here is a nice convention to define your components:
+`src/main/resources/web/components/[name]/[name].{html,css,scss,js,ts,…};`.
+The scripts, styles and assets will be bundled, the html template will
+be usable as a {quarkus-guides-url}/qute-reference#user_tags\[Qute
+tag\].
 
-== Demos
+Example: - `src/main/resources/web/components/hello/hello.html` -
+`src/main/resources/web/components/hello/hello.js` -
+`src/main/resources/web/components/hello/hello.scss`
+
+This way you can use `{#hello}` in your templates and the scripts &
+styles will be bundled.
+
+:::: note
+::: title
+Note
+:::
+
+You may create different qute components groups to be used in different
+pages.
+::::
+
+# Demos {#_demos}
 
 All these demo applications use the **Web Bundler**:
 
-=== Renarde
-* **htmx-todo** — A Todo app using Renarde and Htmx  
-  image:github.svg[width=16px] https://github.com/ia3andy/htmx-todo[Source, window="_blank"]
-* **quarkus-blast** — A board game example with OIDC login using Renarde, Htmx, Hyperscript, and Bootstrap  
-  image:github.svg[width=16px] https://github.com/ia3andy/quarkus-blast[Source, window="_blank"]
-* **renotes** — A note-taking app with Markdown support using Renarde, Htmx, and Bootstrap  
-  image:github.svg[width=16px] https://github.com/ia3andy/renotes[Source, window="_blank"]
+## Renarde {#_renarde}
 
-=== Lit
-* **todo-demo-app** — A Todo demo application using Lit and Vaadin Web Components  
-  image:github.svg[width=16px] https://github.com/quarkusio/todo-demo-app[Source, window="_blank"]
-* **star-rating** — A full-stack star rating web component using Lit  
-  image:github.svg[width=16px] https://github.com/ia3andy/star-rating[Source, window="_blank"]
+- **htmx-todo** --- A Todo app using Renarde and Htmx
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/htmx-todo){window="_blank"}
 
-=== React
-* **quarkus-bundler-react** — A minimalist SPA demo with React Bootstrap  
-  image:github.svg[width=16px] https://github.com/ia3andy/quarkus-bundler-react[Source, window="_blank"]
-* **quarkus-wb-patternfly-react** — A minimalist SPA demo with PatternFly React  
-  image:github.svg[width=16px] https://github.com/ia3andy/quarkus-wb-patternfly-react[Source, window="_blank"]
+- **quarkus-blast** --- A board game example with OIDC login using
+  Renarde, Htmx, Hyperscript, and Bootstrap
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/quarkus-blast){window="_blank"}
 
-=== jQuery
-* **web-bundler-jquery** — A jQuery example with Bootstrap  
-  image:github.svg[width=16px] https://github.com/ia3andy/web-bundler-jquery[Source, window="_blank"]
-* **bundler-gradle-jquery** — The same example using Gradle  
-  image:github.svg[width=16px] https://github.com/ia3andy/bundler-gradle-jquery[Source, window="_blank"]
+- **renotes** --- A note-taking app with Markdown support using Renarde,
+  Htmx, and Bootstrap ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/renotes){window="_blank"}
 
-== Real World
+## Lit {#_lit}
+
+- **todo-demo-app** --- A Todo demo application using Lit and Vaadin Web
+  Components ![](github.svg){width="16px"}
+  [Source](https://github.com/quarkusio/todo-demo-app){window="_blank"}
+
+- **star-rating** --- A full-stack star rating web component using Lit
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/star-rating){window="_blank"}
+
+## React {#_react}
+
+- **quarkus-bundler-react** --- A minimalist SPA demo with React
+  Bootstrap ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/quarkus-bundler-react){window="_blank"}
+
+- **quarkus-wb-patternfly-react** --- A minimalist SPA demo with
+  PatternFly React ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/quarkus-wb-patternfly-react){window="_blank"}
+
+## jQuery {#_jquery}
+
+- **web-bundler-jquery** --- A jQuery example with Bootstrap
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/web-bundler-jquery){window="_blank"}
+
+- **bundler-gradle-jquery** --- The same example using Gradle
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/ia3andy/bundler-gradle-jquery){window="_blank"}
+
+# Real World {#_real_world}
 
 The **Web Bundler** is also used in production applications:
 
-* **code.quarkus.io** — The Code Quarkus app generator, a React SPA  
-  image:github.svg[width=16px] https://github.com/quarkusio/code.quarkus.io[Source, window="_blank"] | https://code.quarkus.io[Visit, window="_blank"]
-* **mvnpm** — The mvnpm SPA built with Lit  
-  image:github.svg[width=16px] https://github.com/mvnpm/mvnpm[Source, window="_blank"] | https://mvnpm.org[Visit, window="_blank"]
-* **RivieraDEV-Quarkus** — The Riviera Dev Conference website built with Renarde (MVC)  
-  image:github.svg[width=16px] https://github.com/FroMage/RivieraDEV-Quarkus[Source, window="_blank"] | https://rivieradev.fr[Visit, window="_blank"]
-* **search.quarkus.io** — Quarkus guides search, a Lit full-stack web component  
-  image:github.svg[width=16px] https://github.com/quarkusio/search.quarkus.io[Source, window="_blank"] | https://quarkus.io/guides[Visit, window="_blank"]
+- **code.quarkus.io** --- The Code Quarkus app generator, a React SPA
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/quarkusio/code.quarkus.io){window="_blank"}
+  \| [Visit](https://code.quarkus.io){window="_blank"}
 
-```
+- **mvnpm** --- The mvnpm SPA built with Lit
+  ![](github.svg){width="16px"}
+  [Source](https://github.com/mvnpm/mvnpm){window="_blank"} \|
+  [Visit](https://mvnpm.org){window="_blank"}
 
+- **RivieraDEV-Quarkus** --- The Riviera Dev Conference website built
+  with Renarde (MVC) ![](github.svg){width="16px"}
+  [Source](https://github.com/FroMage/RivieraDEV-Quarkus){window="_blank"}
+  \| [Visit](https://rivieradev.fr){window="_blank"}
+
+- **search.quarkus.io** --- Quarkus guides search, a Lit full-stack web
+  component ![](github.svg){width="16px"}
+  [Source](https://github.com/quarkusio/search.quarkus.io){window="_blank"}
+  \| [Visit](https://quarkus.io/guides){window="_blank"}
